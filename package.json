@@ -1,0 +1,25 @@
+{
+  "name": "frequencymap",
+  "version": "1.0.0",
+  "description": "Frequency map for radio frequency heat map",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer-core": "^6.0.1",
+    "body-parser": "^1.17.0",
+    "bower": "^1.8.0",
+    "express": "^4.15.0",
+    "jasmine-core": "^2.5.2",
+    "jshint-stylish": "^2.2.1",
+    "karma": "^1.5.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "morgan": "^1.8.1",
+    "nodemon": "^1.11.0",
+    "phantomjs-prebuilt": "^2.1.14"
+  }
+}
