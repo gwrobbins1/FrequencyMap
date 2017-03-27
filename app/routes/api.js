@@ -1,16 +1,13 @@
 var bodyParser = require("body-parser");
 var http = require("http");
+var sensorModule = require("../modules/sensor");
 
 module.exports = function(app,express){
-
 	var apiRouter = express.Router();
-	var sensorFilters = [];
 
-	// apiRouter.get("/live", function(req, res){
 	apiRouter.route("/live")
 	.get(function(req, res){
 		// console.log("request received");
-
 		var testServer = {
 			hostname:"127.0.0.1",
 			port:8080,
@@ -23,26 +20,7 @@ module.exports = function(app,express){
 			});
 
 			results.on('end',function(){
-				var obj = JSON.parse(output);				
-				// console.log(obj);
-				obj.forEach(function(sensor){
-					//do not check sensor checkbox if filtered out
-					if(sensorFilters.length === 0){
-						// console.log("filters are empty");
-						sensor.isActive = true;
-					}else{
-						console.log("there are filters");
-						if( sensorFilters.indexOf(sensor.id) > -1){
-							console.log("setting sensor "+sensor.id+" to inactive");
-							sensor.isActive = false;
-						}else{
-							console.log("filters contains: "+sensorFilters[0]);
-							console.log("setting sensor "+sensor.id+" to active");							
-							sensor.isActive = true;
-						}
-					}
-				});
-				res.json(obj);
+				res.json(sensorModule.cache(JSON.parse(output)));
 			});
 		});
 		request.on('error',function(err){
@@ -54,10 +32,7 @@ module.exports = function(app,express){
 	.post(function(req,res){
 		var sensorId = req.params.sensorId;
 		console.log("sensor id: "+sensorId);
-
-		sensorFilters.push(sensorId);
-		console.log("filters len "+sensorFilters.length );
-
+		sensorModule.addFilter(sensorId);
 		res.json({"message":"filtering out sensor "+sensorId});
 	});
 

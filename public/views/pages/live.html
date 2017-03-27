@@ -43,11 +43,10 @@
 							<th>Longitude</th>
 							<th>Frequency</th>
 							<th>Strength</th>
-							<!-- <th class="col-sm-2"></th> -->
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="sensor in sensors">
+						<tr ng-repeat="sensor in sensors" ng-if="sensor.isActive">
 							<td>{{ sensor.name }}</td>
 							<td>{{ sensor.location[1] }}</td>
 							<td>{{ sensor.location[0] }}</td>
