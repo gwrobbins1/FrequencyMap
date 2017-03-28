@@ -2,19 +2,20 @@ var bodyParser = require("body-parser");
 var http = require("http");
 var sensorModule = require("../modules/sensor");
 
-module.exports = function(app,express){
+module.exports = function(app,express,config){
 	var apiRouter = express.Router();
 
 	apiRouter.route("/live")
 	.get(function(req, res){
 		// console.log("request received");
-		var testServer = {
-			hostname:"127.0.0.1",
-			port:8080,
-			path:"/FrequencyMapTest/Test"
+		var server = {
+			hostname:config['serverIP'],
+			port:config['serverPort'],
+			path:config['path']
 		};
+
 		var output = "";
-		var request = http.get(testServer,function(results){
+		var request = http.get(server,function(results){
 			results.on('data',function(chunk){
 				output += chunk;
 			});
@@ -31,7 +32,7 @@ module.exports = function(app,express){
 	apiRouter.route("/live/:sensorId")
 	.post(function(req,res){
 		var sensorId = req.params.sensorId;
-		console.log("sensor id: "+sensorId);
+		// console.log("sensor id: "+sensorId);
 		sensorModule.addFilter(sensorId);
 		res.json({"message":"filtering out sensor "+sensorId});
 	});
