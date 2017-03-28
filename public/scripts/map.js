@@ -76,6 +76,19 @@ var mapModule = (function(){
 		}catch(ignore){}
 	};
 
+	var removeSensorHeatmap = function(feature){
+		let found = {};
+		try{
+			map.getLayers().forEach(function(layer){
+				if(layer.get('name') === "heatmap"){
+					let src = layer.getSource();
+					src.removeFeature(feature);
+					throw new found();
+				}
+			});
+		}catch(ignore){}
+	};
+
 	var addSensor = function(sensorFeature){
 		let found = {};
 		try{
@@ -90,30 +103,50 @@ var mapModule = (function(){
 	};
 
 	var plotHeatmap = function(value,sensorArray){
-		//remove all frequencies except for the value passed in
-		// sensorArray = sensorArray.map(function(sensor){
-		sensorArray.map(function(sensor){
-			let readings = sensor.readings;
-			let filteredReadings = {};
-
-			filteredReadings[value] = readings[value];
-			sensor.readings = filteredReadings;
-
-			return sensor;
-		});
-
-		let featuresArray = []
-		sensorArray.map(function(sensor){
-
-		});
-		
-		map.getLayers().forEach(function(layer){
-			if(layer.get('name') === 'heatmap'){
-				let src = layer.getSource();
-				src.clear();
-				src.addFeatures();
+		if(value === 0){
+			map.getLayers().forEach(function(layer){
+				if(layer.get('name') === 'heatmap'){
+					map.removeLayer(layer);
+				}
+			});			
+			return [];
+		}
+		let features = [];
+		sensorArray.forEach(function(sensor){
+			if(sensor.isActive){
+				let loc = ol.proj.transform(sensor.location,'EPSG:4326','EPSG:3857');
+				let feature = new ol.Feature({
+					geometry:new ol.geom.Point(loc),
+					weight:(sensor.readings[value] / 100)
+				});
+				feature.setId(sensor.id);
+				features.push(feature);
 			}
 		});
+
+		let found = false;
+		map.getLayers().forEach(function(layer){
+			if(layer.get('name') === 'heatmap'){
+				found = true;
+				let src = layer.getSource();
+				src.clear();
+				src.addFeatures(features);
+				// src.addFeatures(sensorFeatureArray);
+			}
+		});
+
+		if(! found){
+			let heatMapLayer = new ol.layer.Heatmap({
+				source: new ol.source.Vector({
+					features:new ol.Collection(features)
+				})
+			});
+
+			map.addLayer(heatMapLayer);
+			heatMapLayer.set('name','heatmap');
+		}
+
+		return features;
 	};
 
 	return {
@@ -122,6 +155,7 @@ var mapModule = (function(){
 		removeSensor : removeSensor,
 		addSensor : addSensor,
 		plotHeatmap : plotHeatmap,
+		removeSensorHeatmap : removeSensorHeatmap,
 		removeSensorLayer : removeSensorLayer
 	};
 })();
