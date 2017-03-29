@@ -19,7 +19,7 @@ fs.readFile('./config.properties','utf8',function(err,data){
 			config[strArray[0]] = strArray[1];
 		}
 	});
-
+	app.use("/",express.static(path.join(__dirname,"/public")) );
 	var apiRouter = require("./app/routes/api")(app,express,config);
 	app.use("/api", apiRouter);
 	app.get("*",function(req,res){
@@ -31,4 +31,4 @@ fs.readFile('./config.properties','utf8',function(err,data){
 
 });
 
-app.use("/",express.static(path.join(__dirname,"/public")) );
+// app.use("/",express.static(path.join(__dirname,"/public")) );
