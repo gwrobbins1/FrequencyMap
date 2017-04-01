@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="styles/ol.css">
+<link rel="stylesheet" href="styles/live.css">
 
 <script src="scripts/ol.js"></script>
 <script src="scripts/map.js"></script>
@@ -19,7 +20,7 @@
 					<div class="panel-body">
 						<div class="checkboxList">
 							<div ng-repeat="sensor in sensors">
-								<input type="checkbox" ng-model="sensor.isActive" ng-click="filter(sensor.id)"/>{{sensor.name}}
+								<input type="checkbox" ng-model="sensor.isActive" ng-click="filter(sensor.id)"/>{{sensor.name}}  (Long:{{sensor.location[1].toFixed(4)}} : Lat:{{sensor.location[0].toFixed(4)}})
 							</div>
 						</div>
 
@@ -37,8 +38,9 @@
 					<thead>
 						<tr>
 							<th>Name</th>
-							<th>Latitude</th>
-							<th>Longitude</th>
+<!-- 							<th>Latitude</th>
+							<th>Longitude</th> -->
+							<th>Time</th>
 							<th>Frequency</th>
 							<th>Strength</th>
 						</tr>
@@ -46,8 +48,9 @@
 					<tbody>
 						<tr ng-repeat="sensor in sensors" ng-if="sensor.isActive">
 							<td>{{ sensor.name }}</td>
-							<td>{{ sensor.location[1] }}</td>
-							<td>{{ sensor.location[0] }}</td>
+<!-- 							<td>{{ sensor.location[1] }}</td>
+							<td>{{ sensor.location[0] }}</td> -->
+							<td>{{sensor.timeStamp}}
 							<td>{{ freqSlider.value }}</td>
 							<td>{{ sensor.readings[freqSlider.value] }}</td>
 					</tbody>

@@ -50,7 +50,8 @@ angular.module('LiveController',["LiveService"])
   };
 
   pollServer();//load data on initial load.
-  $rootScope.intervalID = setInterval(pollServer,1000);//update data every second.
+  // $rootScope.intervalID = setInterval(pollServer,1000);//update data every second.
+  $rootScope.intervalID = setInterval(pollServer,500);//update data every second.
 
   function filterHeatmap(sensorId){
     let index = -1;

@@ -27,6 +27,7 @@ var sensorModule = (function(){
 			sensorData.forEach(function(sensor){
 				var index = getSensorIndex(sensor.id);
 				sensorCache[index].readings = sensor.readings;
+				sensorCache[index].timeStamp = sensor.timeStamp;
 			});
 		}
 		filter();

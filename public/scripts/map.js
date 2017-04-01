@@ -131,15 +131,26 @@ var mapModule = (function(){
 				let src = layer.getSource();
 				src.clear();
 				src.addFeatures(features);
-				// src.addFeatures(sensorFeatureArray);
 			}
 		});
 
 		if(! found){
 			let heatMapLayer = new ol.layer.Heatmap({
 				source: new ol.source.Vector({
-					features:new ol.Collection(features)
-				})
+					features:new ol.Collection(features)					
+				}),
+				radius:16,
+				blur:0,
+				gradient:['#0000FF',
+						  '#00FFFF',
+						  '#11f769',
+						  '#15542d',
+						  '#FFFF00',
+						  '#FF0000',
+						  '#800000',
+						  '#660066',
+						  '#cc00cc',
+						  '#ffffff']
 			});
 
 			map.addLayer(heatMapLayer);
