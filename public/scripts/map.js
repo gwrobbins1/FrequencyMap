@@ -140,7 +140,7 @@ var mapModule = (function(){
 					features:new ol.Collection(features)					
 				}),
 				radius:16,
-				blur:0,
+				// blur:0,
 				gradient:['#0000FF',
 						  '#00FFFF',
 						  '#11f769',

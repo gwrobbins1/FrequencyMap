@@ -37,6 +37,7 @@ angular.module('LiveController',["LiveService"])
       $scope.sensors = res.data;
       $scope.sensors.forEach(function(sensor){
         let val = $scope.freqSlider.value;
+        console.log("-----------readings: "+sensor.readings[$scope.freqSlider.value]);
         let strength = sensor.readings[$scope.freqSlider.value];
         sensor.readings = {};
         sensor.readings[val] = strength;
@@ -51,7 +52,7 @@ angular.module('LiveController',["LiveService"])
 
   pollServer();//load data on initial load.
   // $rootScope.intervalID = setInterval(pollServer,1000);//update data every second.
-  $rootScope.intervalID = setInterval(pollServer,500);//update data every second.
+  $rootScope.intervalID = setInterval(pollServer,500);//update data every half second.
 
   function filterHeatmap(sensorId){
     let index = -1;

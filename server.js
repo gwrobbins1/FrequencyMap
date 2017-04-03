@@ -14,9 +14,11 @@ var config = {};
 fs.readFile('./config.properties','utf8',function(err,data){
 	if(err){console.log(err);}
 	data.split('\n').forEach(function(line){
-		var strArray = line.split(':');
-		if(strArray[0] !== '' && strArray[1]){
-			config[strArray[0]] = strArray[1];
+		if(line.charAt(0) !== '#'){
+			var strArray = line.split(':');
+			if(strArray[0] !== '' && strArray[1]){
+				config[strArray[0]] = strArray[1];
+			}
 		}
 	});
 	app.use("/",express.static(path.join(__dirname,"/public")) );

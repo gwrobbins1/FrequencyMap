@@ -21,7 +21,9 @@ module.exports = function(app,express,config){
 			});
 
 			results.on('end',function(){
-				res.json(sensorModule.cache(JSON.parse(output)));
+				var result = JSON.parse(output);
+				// console.log(result);
+				res.json(sensorModule.cache(result));
 			});
 		});
 		request.on('error',function(err){
