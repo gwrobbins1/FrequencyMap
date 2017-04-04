@@ -26,7 +26,7 @@
 					</div>
 				</div>
 				<!-- <md-content ng-controller="AppCtrl as ctrl" layout-padding ng-cloak> -->
-				<md-content layout-padding ng-cloak>
+<!-- 				<md-content layout-padding ng-cloak>
 				  <div layout-gt-xs="row">
 				    <div flex-gt-xs>
 				      <h4>Date-picker with min date and max date</h4>
@@ -34,7 +34,16 @@
 				          md-min-date="ctrl.minDate" md-max-date="ctrl.maxDate"></md-datepicker>
 				    </div>
 				  </div>
-				</md-content>				
+				</md-content>	 -->
+				<input date-range-picker class="form-control data-picker" type="text" ng-model="datePicker.date" options="datePicker.options"/>
+
+				<wy-time-picker data-dropdown-toggle-state="timePicker.settings.dropdownToggleState"
+								data-time-settings="timePicker.settings.time"
+								data-no-range="timePicker.settings.noRange"
+								data-format="timePicker.settings.format"
+								data-no-validation="timePicker.settings.noValidation"
+								data-apply-callback="timePicker.onApplyTimePicker()"
+								data-clear-callback="timePicker.onClearTimePicker()"></wy-time-picker>
 			</div>
 			<div class="col-md-8">
 				<div id="map" class="map" style="height:500px; width: 700px; border: 1px solid black">

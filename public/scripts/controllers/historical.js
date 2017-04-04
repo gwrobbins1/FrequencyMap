@@ -17,17 +17,43 @@ angular.module('HistoricalController',['HistoricalService'])
   			ceil:1700,
   			step:1.0,
   			minLimit:0,
-  			maxLimit:1700  				
+  			maxLimit:1700,
+        onEnd: filterFrequency
   		}
   	};
+
+    $scope.datePicker = {
+      date : {
+        startDate:new Date(),
+        endDate:new Date()
+      },
+      options:{
+        format:"YYYY-MM-DD",
+        eventHandlers:{
+          'apply.daterangepicker' : filterDateRange
+        }
+      }
+    };
+
+    $scope.timePicker = {
+      settings:{
+        dropdownToggleState:false,
+        noRange:false,
+        format:24,
+        noValidation:false
+      },
+      onApplyTimePicker:onApplyTimePicker,
+      onClearTimePicker:onClearTimePicker
+    };
 
     if(typeof $rootScope.intervalID !== 'undefined' ){
         clearInterval( $rootScope.intervalID );
         $rootScope.intervalID = undefined;
     }
 
+  let removedSensorFeatures = [];//needed to replot when user reactivates sensor
   let sensorsFeatures = [];
-  let heatmapFeatures = [];
+  let heatmapFeatures = [];  
   // var pollServer = function(){
   //   Historical.get()
   //   .then(function(res){
@@ -52,7 +78,8 @@ angular.module('HistoricalController',['HistoricalService'])
 
   function filterHeatmap(sensorId){
     let index = -1;
-    for(let i =0 ; i < heatmapFeatures.length; i++){
+    let length = heatmapFeatures.length;
+    for(let i =0 ; i < length; i++){
       if(heatmapFeatures[i].getId() === sensorId){
         index = i;
         break;
@@ -65,14 +92,50 @@ angular.module('HistoricalController',['HistoricalService'])
     }
   };
 
-  let removedSensorFeatures = [];//needed to replot when user reactivates sensor
+  function filterDateRange(event,picker){
+    let index = -1;//needed to remove excess data after formating
+    let startDate = event.model.startDate.format().toString();
+    index = startDate.indexOf('T');
+    startDate = startDate.substring(0,index);
+
+    let endDate = event.model.endDate.format().toString();
+    index = endDate.indexOf('T');
+    endDate = endDate.substring(0,index);
+
+    let dateRange = "from:"+startDate+"-"+"to:"+endDate;
+
+    Historical.filterDate(dateRange)
+    .then(function(res){
+      console.log(res.data.message);
+    });
+    // console.log("picked date range: "+startDate+" to "+endDate);
+  };
+
+  function onApplyTimePicker(){
+    let toTime = this.settings.time.toHour + this.settings.time.toMinute;
+    let fromTime = this.settings.time.fromHour + this.settings.time.fromMinute;
+
+    let timeRange ='from:'+fromTime+"-"+"to:"+toTime;
+
+    Historical.filterTime(timeRange)
+    .then(function(res){
+      console.log(res.data.message);
+    });
+    // console.log('toTime: '+toTime+" fromTime:"+fromTime);
+  };
+
+  function onClearTimePicker(){
+    console.log("time range cancelled");
+  };
+
   $scope.filter = function(sensorId){
     Historical.filter(sensorId)
     .then(function(res){
       // console.log(res.data);
       filterHeatmap(sensorId);
       let index = -1;
-      for(var i=0; i<sensorsFeatures.length;i++){
+      let length = sensorsFeatures.length;
+      for(var i=0; i<length;i++){
         if(sensorsFeatures[i].getId() === sensorId){
           index = i;
           break;
@@ -84,7 +147,8 @@ angular.module('HistoricalController',['HistoricalService'])
         mapModule.removeSensor(del[0]);
       }else{//index == -1, sensor not found in sensorFeatures
         //check if sensor is in removed features so we can replot
-        for(i = 0; i<removedSensorFeatures.length;i++){
+        let length = removedSensorFeatures.length;
+        for(i = 0; i<length;i++){
           if(removedSensorFeatures[i].getId() === sensorId){
             index = i;
             break;
@@ -98,5 +162,14 @@ angular.module('HistoricalController',['HistoricalService'])
         }
       }
     });
-  };      
-  });
+  };
+
+  function filterFrequency(){
+    // alert("filtering freq: "+$scope.freqSlider.value);
+    Historical.filterFrequency($scope.freqSlider.value)
+    .then(function(res){
+      console.log(res.data.message);
+    });
+  };
+
+});

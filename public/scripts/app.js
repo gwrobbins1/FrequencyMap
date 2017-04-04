@@ -10,9 +10,8 @@
  */
 angular
   .module('frequencyMapApp', [
-    'ngAria',
-    'ngMaterial',
-    'ngMessages',
+    'wingify.timePicker',
+    'daterangepicker',
     'ngAnimate',
     'ngRoute',
     'rzModule',

@@ -26,11 +26,26 @@ angular.module("app.routes", ["ngRoute"])
         controller: 'HistoricalCtrl',
         controllerAs: 'historical'
       })
-      .when('/historical:sensorId',{
+      .when('/historical/sensor/:sensorId',{
         templateUrl: 'views/pages/historical.html',
         controller: 'HistoricalCtrl',
         controllerAs: 'historical'
-      })      
+      })
+      .when('/historical/freq/:frequency',{
+        templateUrl: 'views/pages/historical.html',
+        controller: 'HistoricalCtrl',
+        controllerAs: 'historical'
+      })
+      .when('/historical/time/:timeRange',{
+        templateUrl: 'views/pages/historical.html',
+        controller: 'HistoricalCtrl',
+        controllerAs: 'historical'
+      }) 
+      .when('/historical/date/:dateRange',{
+        templateUrl: 'views/pages/historical.html',
+        controller: 'HistoricalCtrl',
+        controllerAs: 'historical'
+      })
       .otherwise({
         redirectTo: '/'
       });
