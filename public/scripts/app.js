@@ -10,12 +10,15 @@
  */
 angular
   .module('frequencyMapApp', [
+    'ngMaterial',
+    'ngMessages',
     'ngAnimate',
     'ngRoute',
     'rzModule',
     'LiveService',
     'LiveController',
     'AboutController',
+    'HistoricalService',
     'HistoricalController',
     'MainController',
     'NavController',

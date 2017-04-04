@@ -17,7 +17,7 @@ angular.module('LiveController',["LiveService"])
 		options:{
 			floor:0,
 			ceil:1700,
-			step:0.5,
+			step:1,
   		minLimit:0,
   		maxLimit:1700
 		}
@@ -37,7 +37,6 @@ angular.module('LiveController',["LiveService"])
       $scope.sensors = res.data;
       $scope.sensors.forEach(function(sensor){
         let val = $scope.freqSlider.value;
-        console.log("-----------readings: "+sensor.readings[$scope.freqSlider.value]);
         let strength = sensor.readings[$scope.freqSlider.value];
         sensor.readings = {};
         sensor.readings[val] = strength;

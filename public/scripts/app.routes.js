@@ -16,16 +16,21 @@ angular.module("app.routes", ["ngRoute"])
         controller: 'LiveCtrl',
         controllerAs: 'live'
       })
-      .when('/historical',{
-        templateUrl: 'views/pages/historical.html',
-        controller: 'HistoricalCtrl',
-        controllerAs: 'historical'
-      })
       .when('/live/:sensorId',{
         templateUrl: 'views/pages/live.html',
         controller: 'LiveCtrl',
         controllerAs: 'live'      	
       })
+      .when('/historical',{
+        templateUrl: 'views/pages/historical.html',
+        controller: 'HistoricalCtrl',
+        controllerAs: 'historical'
+      })
+      .when('/historical:sensorId',{
+        templateUrl: 'views/pages/historical.html',
+        controller: 'HistoricalCtrl',
+        controllerAs: 'historical'
+      })      
       .otherwise({
         redirectTo: '/'
       });
