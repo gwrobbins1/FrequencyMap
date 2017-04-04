@@ -10,6 +10,7 @@
  */
 angular
   .module('frequencyMapApp', [
+    'ngAria',
     'ngMaterial',
     'ngMessages',
     'ngAnimate',
