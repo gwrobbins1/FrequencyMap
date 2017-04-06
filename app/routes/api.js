@@ -69,7 +69,7 @@ module.exports = function(app,express,config){
 			// 	res.json({"message":"error loading data"});
 			// });
 			var data = pollTestServer();
-			res.json({"message":data});
+			res.json({"message":'message received from test sever'});
 		}else{
 			res.json({"message":"filtering frequency: "+freq});
 		}
@@ -89,7 +89,7 @@ module.exports = function(app,express,config){
 			// 	res.json({"message":"error loading data"});
 			// });
 			var data =pollTestServer();
-			res.json({"message":data});
+			res.json({"message":'message received from test sever'});
 		}else{
 			res.json({"message":"passing times: "+timeRange});
 		}
@@ -111,7 +111,7 @@ module.exports = function(app,express,config){
 			// });
 
 			var data = pollTestServer();
-			res.json({"message":data.message});
+			res.json({"message":'message received from test sever'});
 		}else{
 			res.json({"message":"passing date: "+dateRange});
 		}
@@ -119,14 +119,15 @@ module.exports = function(app,express,config){
 
 	function pollTestServer(){
 		var pathWfilters = "/historical/freq:"+filterModule.getFreqFilter() +
-							"-dateRange:"+filterModule.getDateRangeFilter() +
-							"-timeRange:"+filterModule.getTimeRangeFilter();
+							"#dateRange:"+filterModule.getDateRangeFilter() +
+							"#timeRange:"+filterModule.getTimeRangeFilter();
 		// console.log("sending query inside promise"+pathWfilters);
 		var queryServer = {
 			hostname:config['serverIP'],
 			port:config['serverPort'],
 			path:pathWfilters
-		}
+		};
+		
 		var output = "";
 		var request = http.get(queryServer,function(results){
 			results.on('data',function(chunk){
