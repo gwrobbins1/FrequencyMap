@@ -22,6 +22,13 @@ var filterModule = (function(){
 		}
 	};
 
+	var clear = function(){
+		Object.keys(filters).forEach(function(key){
+			filters[key] = [];
+		});
+		console.log("cleared filters");
+	};
+
 	var removeFilter = function(type,filter){
 		var filterLst = filters[type];
 		var index = filterLst.indexOf(filter);
@@ -35,8 +42,6 @@ var filterModule = (function(){
 	var filter = function(data){
 
 	};
-
-	var isEmpty = function(){ return (Object.keys(filters).length === 0); };
 
 	function containsType(type){
 		var types = Object.keys(filters);
@@ -60,7 +65,7 @@ var filterModule = (function(){
 	return{
 		addFilter : addFilter,
 		removeFilter : removeFilter,
-		isEmpty : isEmpty,
+		clear : clear,
 		filter : filter,
 		isFullSet : isFullSet,
 		getSensorFilters : getSensorFilters,

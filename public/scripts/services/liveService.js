@@ -13,6 +13,10 @@ angular.module("LiveService",[])
 	liveFactory.filter = function(sensorId){
 		return $http.post("/api/live/"+sensorId);
 	};
+
+	liveFactory.clearFilters = function(){
+		return $http.post("/api/live/clear/");
+	}
 	
 	return liveFactory;
 });

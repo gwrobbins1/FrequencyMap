@@ -56,7 +56,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="sensor in sensors">
+						<tr ng-repeat="sensor in sensors" ng-if="sensor.isActive != false">
 							<td>Sensor-{{ sensor.SID }}</td>
 							<td>{{sensor.timeStamp}}
 							<td>{{ freqSlider.value }}</td>

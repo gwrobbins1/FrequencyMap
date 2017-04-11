@@ -8,15 +8,17 @@ module.exports = function(app,express,config){
 	db.init(config);
 
 	apiRouter.route("/live")
-	.get(function(req, res){		
-		res.json({'sensors':sensors});
+	.get(function(req, res){
+		db.getSensors(undefined,function(sensors){
+			res.json({'sensors':sensors});
+		});
 	})
 	
 	apiRouter.route("/live/sensors")
 	.post(function(req,res){
-		var filters = filterModule.getSensorFilters();
-		console.log(filters);
-		db.getSensors(filters,function(sensors){
+		// var filters = filterModule.getSensorFilters();
+		// console.log(filters);
+		db.getSensors(undefined,function(sensors){
 			res.json({'sensors':sensors});
 		});
 	});
@@ -28,6 +30,12 @@ module.exports = function(app,express,config){
 		// sensorModule.addFilter(sensorId);
 		filterModule.addFilter('sensor',sensorId);
 		res.json({"message":"filtering out sensor "+sensorId});
+	});
+
+	apiRouter.route("/live/clear")
+	.post(function(req,res){
+		filterModule.clear();
+		res.json({"message":"cleared filters"});
 	});
 
 	apiRouter.route("/historical")

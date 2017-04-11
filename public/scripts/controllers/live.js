@@ -37,13 +37,26 @@ angular.module('LiveController',["LiveService"])
       // console.log(res.data);
       if(res.data && res.data.sensors){
         console.log("received sensor data");
+        let deactivated = [];
+        $scope.sensors.forEach(function(sensor){
+          if(sensor.isActive && sensor.isActive === false){
+            deactivated.push(sensor.SID);
+          }
+        });
+
         $scope.sensors = res.data.sensors;
+        $scope.sensors.forEach(function(sensor){
+          if(sensor.SID in deactivated){
+            sensor.isActive = false;
+          }
+        });
       }
     });
   };
-
-  getSensors();//load sensors on intial page load.
-  $rootScope.intervalIDs.push(setInterval(getSensors,60e3));//update sensors every minute
+  getSensors();
+  //need to check if new sensors came online or a sensor goes offline
+  let sensorPoll = setInterval(getSensors,60e3);//update sensors every minute
+  $rootScope.intervalIDs.push(sensorPoll);
 
   // let sensorsFeatures = [];
   // let heatmapFeatures = [];
@@ -89,6 +102,22 @@ angular.module('LiveController',["LiveService"])
     Live.filter(sensorId)
     .then(function(res){
       console.log(res.data);
+      let Break = {};
+      $scope.sensors.forEach(function(sensor){
+        try{
+          if(sensor.SID === sensorId){
+            if(sensor.isActive !== undefined){
+              if( sensor.isActive === false ){
+                sensor.isActive = undefined;
+                getSensors();
+              }              
+            }else{
+              sensor.isActive = false;
+            }
+            throw new Break();
+          }
+        }catch(ignore){}
+      });
       // filterHeatmap(sensorId);
       // let index = -1;
       // for(var i=0; i<sensorsFeatures.length;i++){
