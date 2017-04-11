@@ -24,82 +24,98 @@ angular.module('LiveController',["LiveService"])
 	};
 
   //stop polling server for data
-  if($rootScope.intervalID){
-      clearInterval( $rootScope.intervalID );
-      $rootScope.intervalID = undefined;
+  if($rootScope.intervalIDs.length > 0){
+    $rootScope.intervalIDs.forEach(function(id){
+      clearInterval( $rootScope.intervalIDs[id] );
+    });
+    $rootScope.intervalIDs = [];
   }
 
-  let sensorsFeatures = [];
-  let heatmapFeatures = [];
-  var pollServer = function(){
-    Live.get()
+  var getSensors = function(){
+    Live.getSensors()
     .then(function(res){
-      $scope.sensors = res.data;
-      $scope.sensors.forEach(function(sensor){
-        let val = $scope.freqSlider.value;
-        let strength = sensor.readings[$scope.freqSlider.value];
-        sensor.readings = {};
-        sensor.readings[val] = strength;
-      });
-      if(sensorsFeatures.length === 0){
-        sensorsFeatures = mapModule.makeSensorFeatureArray($scope.sensors);            
-        mapModule.addSensorLayer(sensorsFeatures);            
-      }//else would be used if the sensors are changing location.
-      heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value,$scope.sensors);
+      // console.log(res.data);
+      if(res.data && res.data.sensors){
+        console.log("received sensor data");
+        $scope.sensors = res.data.sensors;
+      }
     });
   };
 
-  pollServer();//load data on initial load.
-  $rootScope.intervalID = setInterval(pollServer,1000);//update data every second.
-  // $rootScope.intervalID = setInterval(pollServer,500);//update data every half second.
+  getSensors();//load sensors on intial page load.
+  $rootScope.intervalIDs.push(setInterval(getSensors,60e3));//update sensors every minute
 
-  function filterHeatmap(sensorId){
-    let index = -1;
-    for(let i =0 ; i < heatmapFeatures.length; i++){
-      if(heatmapFeatures[i].getId() === sensorId){
-        index = i;
-        break;
-      }
-    }
+  // let sensorsFeatures = [];
+  // let heatmapFeatures = [];
+  // var pollServer = function(){
+  //   Live.get()
+  //   .then(function(res){
+  //     $scope.sensors = res.data;
+  //     $scope.sensors.forEach(function(sensor){
+  //       let val = $scope.freqSlider.value;
+  //       let strength = sensor.readings[$scope.freqSlider.value];
+  //       sensor.readings = {};
+  //       sensor.readings[val] = strength;
+  //     });
+  //     if(sensorsFeatures.length === 0){
+  //       sensorsFeatures = mapModule.makeSensorFeatureArray($scope.sensors);            
+  //       mapModule.addSensorLayer(sensorsFeatures);            
+  //     }//else would be used if the sensors are changing location.
+  //     heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value,$scope.sensors);
+  //   });
+  // };
 
-    if(index !== -1){
-      mapModule.removeSensorHeatmap(heatmapFeatures[index]);
-      heatmapFeatures.splice(index,1);
-    }
-  };
+  // pollServer();//load data on initial load.
+  // $rootScope.intervalID = setInterval(pollServer,1000);//update data every second.
+  // // $rootScope.intervalID = setInterval(pollServer,500);//update data every half second.
+
+  // function filterHeatmap(sensorId){
+  //   let index = -1;
+  //   for(let i =0 ; i < heatmapFeatures.length; i++){
+  //     if(heatmapFeatures[i].getId() === sensorId){
+  //       index = i;
+  //       break;
+  //     }
+  //   }
+
+  //   if(index !== -1){
+  //     mapModule.removeSensorHeatmap(heatmapFeatures[index]);
+  //     heatmapFeatures.splice(index,1);
+  //   }
+  // };
 
   let removedSensorFeatures = [];//needed to replot when user reactivates sensor
   $scope.filter = function(sensorId){
     Live.filter(sensorId)
     .then(function(res){
-      // console.log(res.data);
-      filterHeatmap(sensorId);
-      let index = -1;
-      for(var i=0; i<sensorsFeatures.length;i++){
-        if(sensorsFeatures[i].getId() === sensorId){
-          index = i;
-          break;
-        }
-      }
-      if(index !== -1){//found in sensorFeatures
-        let del = sensorsFeatures.splice(i,1);//returns an array
-        removedSensorFeatures.push(del[0]);
-        mapModule.removeSensor(del[0]);
-      }else{//index == -1, sensor not found in sensorFeatures
-        //check if sensor is in removed features so we can replot
-        for(i = 0; i<removedSensorFeatures.length;i++){
-          if(removedSensorFeatures[i].getId() === sensorId){
-            index = i;
-            break;
-          }
-        }
+      console.log(res.data);
+      // filterHeatmap(sensorId);
+      // let index = -1;
+      // for(var i=0; i<sensorsFeatures.length;i++){
+      //   if(sensorsFeatures[i].getId() === sensorId){
+      //     index = i;
+      //     break;
+      //   }
+      // }
+      // if(index !== -1){//found in sensorFeatures
+      //   let del = sensorsFeatures.splice(i,1);//returns an array
+      //   removedSensorFeatures.push(del[0]);
+      //   mapModule.removeSensor(del[0]);
+      // }else{//index == -1, sensor not found in sensorFeatures
+      //   //check if sensor is in removed features so we can replot
+      //   for(i = 0; i<removedSensorFeatures.length;i++){
+      //     if(removedSensorFeatures[i].getId() === sensorId){
+      //       index = i;
+      //       break;
+      //     }
+      //   }
 
-        if(index !== -1){//found in removed features
-          let replot = removedSensorFeatures.splice(index,1);//returns array
-          sensorsFeatures.push(replot[0]);
-          mapModule.addSensor(replot[0]);
-        }
-      }
+      //   if(index !== -1){//found in removed features
+      //     let replot = removedSensorFeatures.splice(index,1);//returns array
+      //     sensorsFeatures.push(replot[0]);
+      //     mapModule.addSensor(replot[0]);
+      //   }
+      // }
     });
   };
 });

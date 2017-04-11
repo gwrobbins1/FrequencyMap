@@ -10,8 +10,11 @@
 // angular.module('frequencyMapApp')
 angular.module('AboutController',[])
   .controller('AboutCtrl', function ($rootScope) {
-		if(typeof $rootScope.intervalID !== 'undefined' ){
-		    clearInterval( $rootScope.intervalID );
-		    $rootScope.intervalID = undefined;
-		}    
+	  //stop polling server for data
+	  if($rootScope.intervalIDs.length > 0){
+	    $rootScope.intervalIDs.forEach(function(id){
+	      clearInterval( $rootScope.intervalIDs[id] );
+	    });
+	    $rootScope.intervalIDs = [];
+	  }   
   });

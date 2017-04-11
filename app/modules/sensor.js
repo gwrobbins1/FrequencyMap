@@ -95,7 +95,7 @@ var sensorModule = (function(){
 	return {
 		cache : cache,
 		isCacheEmpty : isCacheEmpty,
-		filter : filter,
+		// filter : filter,
 		addFilter : addFilter
 	};
 

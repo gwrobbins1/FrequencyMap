@@ -3,11 +3,23 @@
 var filterModule = (function(){
 	//filter map by {type : filter constraint}
 	var filters = {};
+	filters.sensors = [];
 
 	var addFilter = function(type,filter){
-		// console.log("adding filter");
-		var types = Object.keys(filters);
-		filters[type] = filter;
+		switch(type){
+			case "sensor":
+				filter = parseInt(filter);
+				var filterLst = filters.sensors;
+				var index = filterLst.indexOf(filter);
+				if( index !== -1 ){//found
+					console.log("removing filter");
+					filters.sensors.splice(index,1);//remove from list of filters
+				}else{
+					console.log("adding new filter");
+					filters.sensors.push(filter);
+				}			
+				break;
+		}
 	};
 
 	var removeFilter = function(type,filter){
@@ -28,20 +40,14 @@ var filterModule = (function(){
 
 	function containsType(type){
 		var types = Object.keys(filters);
-		// console.log(types);
 		return (types.indexOf(type) !== -1);
 	};
 
 	//determines if all filters are present. needed before quering the db.
 	var isFullSet = function(){
-		// console.log("checking if full set");
-		// console.log("checking frequency: "+containsType("frequency"));
-		// console.log("checking dateRanage: "+containsType("dateRange"));
-		// console.log("checking timeRange: "+containsType("timeRange"));
 		if( containsType("frequency") && 
 			containsType("dateRange") && 
 			containsType("timeRange") ){
-			// console.log("full set is true");
 			return true;
 		}else{ return false; }
 	};
@@ -49,6 +55,7 @@ var filterModule = (function(){
 	var getFreqFilter = function(){ return filters['frequency']; };
 	var getDateRangeFilter = function(){ return filters['dateRange']; };
 	var getTimeRangeFilter = function(){ return filters['timeRange']; };
+	var getSensorFilters = function(){ return filters.sensors;}
 
 	return{
 		addFilter : addFilter,
@@ -56,6 +63,7 @@ var filterModule = (function(){
 		isEmpty : isEmpty,
 		filter : filter,
 		isFullSet : isFullSet,
+		getSensorFilters : getSensorFilters,
 		getFreqFilter : getFreqFilter,
 		getDateRangeFilter : getDateRangeFilter,
 		getTimeRangeFilter : getTimeRangeFilter

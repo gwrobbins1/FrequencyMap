@@ -16,6 +16,11 @@ angular.module("app.routes", ["ngRoute"])
         controller: 'LiveCtrl',
         controllerAs: 'live'
       })
+      .when('/live/sensors',{
+        templateUrl: 'views/pages/live.html',
+        controller: 'LiveCtrl',
+        controllerAs: 'live'
+      })
       .when('/live/:sensorId',{
         templateUrl: 'views/pages/live.html',
         controller: 'LiveCtrl',

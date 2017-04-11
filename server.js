@@ -30,7 +30,4 @@ fs.readFile('./config.properties','utf8',function(err,data){
 	var port = parseInt(config['port']);
 	app.listen( port );
 	console.log("server started on port: "+port);
-
 });
-
-// app.use("/",express.static(path.join(__dirname,"/public")) );

@@ -20,7 +20,7 @@
 					<div class="panel-body">
 						<div class="checkboxList">
 							<div ng-repeat="sensor in sensors">
-								<input type="checkbox" ng-model="sensor.isActive" ng-click="filter(sensor.id)"/>{{sensor.name}}  (Long:{{sensor.location[1].toFixed(4)}} : Lat:{{sensor.location[0].toFixed(4)}})
+								<input type="checkbox" ng-click="filter(sensor.SID);" checked/>Sensor-{{sensor.SID}}  (Long:{{sensor.Longitude.toFixed(4)}} : Lat:{{sensor.Latitude.toFixed(4)}} )
 							</div>
 						</div>
 
@@ -46,27 +46,24 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<table class="table table-bordered table-striped" ng-show="sensors">
+ 				<table class="table table-bordered table-striped" ng-show="sensors">
 					<thead>
 						<tr>
 							<th>Name</th>
-<!-- 							<th>Latitude</th>
-							<th>Longitude</th> -->
 							<th>Time</th>
 							<th>Frequency</th>
 							<th>Strength</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="sensor in sensors" ng-if="sensor.isActive">
-							<td>{{ sensor.name }}</td>
-<!-- 							<td>{{ sensor.location[1] }}</td>
-							<td>{{ sensor.location[0] }}</td> -->
+						<tr ng-repeat="sensor in sensors">
+							<td>Sensor-{{ sensor.SID }}</td>
 							<td>{{sensor.timeStamp}}
 							<td>{{ freqSlider.value }}</td>
 							<td>{{ sensor.readings[freqSlider.value] }}</td>
 					</tbody>
 				</table>
+
 			</div>
 		</div>
 	</div>

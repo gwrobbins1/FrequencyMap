@@ -6,6 +6,10 @@ angular.module("LiveService",[])
 		return $http.get("/api/live/");
 	};
 
+	liveFactory.getSensors = function(){
+		return $http.post("/api/live/sensors/");
+	}
+
 	liveFactory.filter = function(sensorId){
 		return $http.post("/api/live/"+sensorId);
 	};

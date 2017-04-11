@@ -46,10 +46,13 @@ angular.module('HistoricalController',['HistoricalService'])
       onClearTimePicker:onClearTimePicker
     };
 
-    if(typeof $rootScope.intervalID !== 'undefined' ){
-        clearInterval( $rootScope.intervalID );
-        $rootScope.intervalID = undefined;
-    }
+  //stop polling server for data
+  if($rootScope.intervalIDs.length > 0){
+    $rootScope.intervalIDs.forEach(function(id){
+      clearInterval( $rootScope.intervalIDs[id] );
+    });
+    $rootScope.intervalIDs = [];
+  }
 
   let removedSensorFeatures = [];//needed to replot when user reactivates sensor
   let sensorsFeatures = [];
