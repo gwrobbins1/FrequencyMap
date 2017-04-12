@@ -13,7 +13,7 @@ angular.module('AboutController',[])
 	  //stop polling server for data
 	  if($rootScope.intervalIDs.length > 0){
 	    $rootScope.intervalIDs.forEach(function(id){
-	      clearInterval( $rootScope.intervalIDs[id] );
+	      clearInterval( id );
 	    });
 	    $rootScope.intervalIDs = [];
 	  }   

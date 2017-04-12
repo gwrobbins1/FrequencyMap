@@ -37,7 +37,6 @@ module.exports = function(app,express,config){
 		filterModule.clear();
 		res.json({"message":"cleared filters"});
 	});
-
 	apiRouter.route("/historical")
 	.get(function(req,res){
 		result.json({'message':'testing'});

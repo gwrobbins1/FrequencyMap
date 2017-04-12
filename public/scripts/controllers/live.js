@@ -26,7 +26,7 @@ angular.module('LiveController',["LiveService"])
   //stop polling server for data
   if($rootScope.intervalIDs.length > 0){
     $rootScope.intervalIDs.forEach(function(id){
-      clearInterval( $rootScope.intervalIDs[id] );
+      clearInterval( id );
     });
     $rootScope.intervalIDs = [];
   }
@@ -34,22 +34,26 @@ angular.module('LiveController',["LiveService"])
   var getSensors = function(){
     Live.getSensors()
     .then(function(res){
-      // console.log(res.data);
       if(res.data && res.data.sensors){
-        console.log("received sensor data");
-        let deactivated = [];
-        $scope.sensors.forEach(function(sensor){
-          if(sensor.isActive && sensor.isActive === false){
-            deactivated.push(sensor.SID);
-          }
-        });
+        if($scope.sensors === undefined || $scope.sensors.length === 0){
+          $scope.sensors = res.data.sensors;
+          $scope.sensors.forEach(function(sensor){
+            sensor.isActive = true;
+          });
+        }else{
+          let deactivated = [];
+          $scope.sensors.forEach(function(sensor){
+            if(sensor.isActive === false){
+              deactivated.push(sensor.SID);
+            }
+          });
 
-        $scope.sensors = res.data.sensors;
-        $scope.sensors.forEach(function(sensor){
-          if(sensor.SID in deactivated){
-            sensor.isActive = false;
-          }
-        });
+          $scope.sensors = res.data.sensors;
+          $scope.sensors.forEach(function(sensor){
+            sensor.isActive = (deactivated.includes(sensor.SID)) ? 
+                              false : true;
+          });
+        }
       }
     });
   };
@@ -106,13 +110,10 @@ angular.module('LiveController',["LiveService"])
       $scope.sensors.forEach(function(sensor){
         try{
           if(sensor.SID === sensorId){
-            if(sensor.isActive !== undefined){
-              if( sensor.isActive === false ){
-                sensor.isActive = undefined;
-                getSensors();
-              }              
+            if(sensor.isActive === true){
+              sensor.isActive = false;              
             }else{
-              sensor.isActive = false;
+              sensor.isActive = true;
             }
             throw new Break();
           }

@@ -20,7 +20,7 @@
 					<div class="panel-body">
 						<div class="checkboxList">
 							<div ng-repeat="sensor in sensors">
-								<input type="checkbox" ng-click="filter(sensor.SID);" checked/>Sensor-{{sensor.SID}}  (Long:{{sensor.Longitude.toFixed(4)}} : Lat:{{sensor.Latitude.toFixed(4)}} )
+								<input type="checkbox" ng-click="filter(sensor.SID);" ng-model="sensor.isActive;"/>Sensor-{{sensor.SID}}  (Long:{{sensor.Longitude.toFixed(4)}} : Lat:{{sensor.Latitude.toFixed(4)}} )
 							</div>
 						</div>
 
