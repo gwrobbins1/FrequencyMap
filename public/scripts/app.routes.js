@@ -15,47 +15,27 @@ angular.module("app.routes", ["ngRoute"])
         templateUrl: 'views/pages/live.html',
         controller: 'LiveCtrl',
         controllerAs: 'live'
-      })
-      .when('/live/clear',{
-        templateUrl: 'views/pages/live.html',
-        controller: 'LiveCtrl',
-        controllerAs: 'live'
-      })      
+      })   
       .when('/live/sensors',{
         templateUrl: 'views/pages/live.html',
         controller: 'LiveCtrl',
         controllerAs: 'live'
       })
-      .when('/live/:sensorId',{
+      .when('/live/readings',{
         templateUrl: 'views/pages/live.html',
         controller: 'LiveCtrl',
-        controllerAs: 'live'      	
-      })
+        controllerAs: 'live'
+      })      
       .when('/historical',{
         templateUrl: 'views/pages/historical.html',
         controller: 'HistoricalCtrl',
         controllerAs: 'historical'
       })
-      .when('/historical/sensor/:sensorId',{
+      .when('/historical/readings',{
         templateUrl: 'views/pages/historical.html',
         controller: 'HistoricalCtrl',
         controllerAs: 'historical'
-      })
-      .when('/historical/freq/:frequency',{
-        templateUrl: 'views/pages/historical.html',
-        controller: 'HistoricalCtrl',
-        controllerAs: 'historical'
-      })
-      .when('/historical/time/:timeRange',{
-        templateUrl: 'views/pages/historical.html',
-        controller: 'HistoricalCtrl',
-        controllerAs: 'historical'
-      }) 
-      .when('/historical/date/:dateRange',{
-        templateUrl: 'views/pages/historical.html',
-        controller: 'HistoricalCtrl',
-        controllerAs: 'historical'
-      })
+      })      
       .otherwise({
         redirectTo: '/'
       });

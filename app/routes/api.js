@@ -1,6 +1,4 @@
 var bodyParser = require("body-parser");
-var sensorModule = require("../modules/sensor");
-var filterModule = require("../modules/filter");
 var db = require("../modules/dbUtils");
 
 module.exports = function(app,express,config){	
@@ -16,75 +14,35 @@ module.exports = function(app,express,config){
 	
 	apiRouter.route("/live/sensors")
 	.post(function(req,res){
-		// var filters = filterModule.getSensorFilters();
-		// console.log(filters);
 		db.getSensors(undefined,function(sensors){
 			res.json({'sensors':sensors});
 		});
 	});
 
-	apiRouter.route("/live/:sensorId")
-	.post(function(req,res){
-		var sensorId = req.params.sensorId;
-		// console.log("sensor id: "+sensorId);
-		// sensorModule.addFilter(sensorId);
-		filterModule.addFilter('sensor',sensorId);
-		res.json({"message":"filtering out sensor "+sensorId});
-	});
+	apiRouter.route("/live/readings")
+	.post(function(req,res) {
+		var freq = req.body.frequency;
+		var sensors = req.body.sensors;
 
-	apiRouter.route("/live/clear")
-	.post(function(req,res){
-		filterModule.clear();
-		res.json({"message":"cleared filters"});
-	});
+		console.log("received request :");
+		console.log("request freq: "+freq);
+		if(sensors.length > 0){
+			sensors.forEach(function(sensor){
+				console.log("request sensor id: "+sensor);
+			});
+		}
+
+		res.json({"message":"received filtered request"});
+	})
+
 	apiRouter.route("/historical")
 	.get(function(req,res){
-		result.json({'message':'testing'});
+		result.json({'message':'historical page'});
 	});
 
-	apiRouter.route("/historical/sensor/:sensorId")
+	apiRouter.route("/historical/readings")
 	.post(function(req,res){
-		var sensorId = req.params.sensorId;
-		// console.log("sensor id: "+sensorId);
-		sensorModule.addFilter(sensorId);
-		res.json({"message":"filtering out sensor "+sensorId});
-	});
-
-	apiRouter.route("/historical/freq/:frequency")
-	.post(function(req,res){
-		var freq = req.params.frequency;
-		console.log("filtering frequency:"+freq);
-
-		filterModule.addFilter('frequency',freq);
-		if( filterModule.isFullSet() ){
-			res.json({"message":'message received from test sever'});
-		}else{
-			res.json({"message":"filtering frequency: "+freq});
-		}
-	});
-
-	apiRouter.route("/historical/time/:timeRange")
-	.post(function(req,res){
-		var timeRange = req.params.timeRange;
-		console.log("filtering times:"+timeRange);
-		filterModule.addFilter('timeRange',timeRange);
-		if( filterModule.isFullSet() ){
-			res.json({"message":'message received from test sever'});
-		}else{
-			res.json({"message":"passing times: "+timeRange});
-		}
-	});
-
-	apiRouter.route("/historical/date/:dateRange")
-	.post(function(req,res){
-		var dateRange = req.params.dateRange;
-		console.log("filtering dates:"+dateRange);
-		filterModule.addFilter('dateRange',dateRange);
-		if(filterModule.isFullSet()){
-			res.json({"message":'message received from test sever'});
-		}else{
-			res.json({"message":"passing date: "+dateRange});
-		}
+		res.json({"message":"getting historical readings"});
 	});
 
 	return apiRouter;

@@ -2,7 +2,6 @@
 var mysql = require("mysql");
 var dbUtils = (function(){
 	var configuration = null;
-	// var connection = null;
 	var pool = null;
 
 	var init = function(config){
@@ -60,11 +59,9 @@ var dbUtils = (function(){
 	};
 
 	var insertSensors = function(sensorArray){
-		// var connection = connect();
 		pool.getConnection(function(err,connection){
 			if(err){console.log(err);}
 			else{
-				// return connection;
 				if(connection !== undefined){
 		     	console.log("inserting sensors");
 					connection.query(

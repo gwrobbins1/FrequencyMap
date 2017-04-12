@@ -57,27 +57,6 @@ angular.module('HistoricalController',['HistoricalService'])
   let removedSensorFeatures = [];//needed to replot when user reactivates sensor
   let sensorsFeatures = [];
   let heatmapFeatures = [];  
-  // var pollServer = function(){
-  //   Historical.get()
-  //   .then(function(res){
-  //     $scope.sensors = res.data;
-  //     $scope.sensors.forEach(function(sensor){
-  //       let val = $scope.freqSlider.value;
-  //       let strength = sensor.readings[$scope.freqSlider.value];
-  //       sensor.readings = {};
-  //       sensor.readings[val] = strength;
-  //     });
-  //     if(sensorsFeatures.length === 0){
-  //       sensorsFeatures = mapModule.makeSensorFeatureArray($scope.sensors);            
-  //       mapModule.addSensorLayer(sensorsFeatures);            
-  //     }//else would be used if the sensors are changing location.
-  //     heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value,$scope.sensors);
-  //   });
-  // };
-
-  // pollServer();//load data on initial load.
-  // $rootScope.intervalID = setInterval(pollServer,1000);//update data every second.
-  // $rootScope.intervalID = setInterval(pollServer,500);//update data every half second.
 
   function filterHeatmap(sensorId){
     let index = -1;
@@ -107,11 +86,7 @@ angular.module('HistoricalController',['HistoricalService'])
 
     let dateRange = "from:"+startDate+"-"+"to:"+endDate;
 
-    Historical.filterDate(dateRange)
-    .then(function(res){
-      console.log(res.data.message);
-    });
-    // console.log("picked date range: "+startDate+" to "+endDate);
+    console.log("picked date range: "+startDate+" to "+endDate);
   };
 
   function onApplyTimePicker(){
@@ -120,59 +95,19 @@ angular.module('HistoricalController',['HistoricalService'])
 
     let timeRange ='from:'+fromTime+"-"+"to:"+toTime;
 
-    Historical.filterTime(timeRange)
-    .then(function(res){
-      console.log(res.data.message);
-    });
-    // console.log('toTime: '+toTime+" fromTime:"+fromTime);
+    console.log('toTime: '+toTime+" fromTime:"+fromTime);
   };
 
   function onClearTimePicker(){
     console.log("time range cancelled");
   };
 
-  $scope.filter = function(sensorId){
-    Historical.filter(sensorId)
-    .then(function(res){
-      // console.log(res.data);
-      filterHeatmap(sensorId);
-      let index = -1;
-      let length = sensorsFeatures.length;
-      for(var i=0; i<length;i++){
-        if(sensorsFeatures[i].getId() === sensorId){
-          index = i;
-          break;
-        }
-      }
-      if(index !== -1){//found in sensorFeatures
-        let del = sensorsFeatures.splice(i,1);//returns an array
-        removedSensorFeatures.push(del[0]);
-        mapModule.removeSensor(del[0]);
-      }else{//index == -1, sensor not found in sensorFeatures
-        //check if sensor is in removed features so we can replot
-        let length = removedSensorFeatures.length;
-        for(i = 0; i<length;i++){
-          if(removedSensorFeatures[i].getId() === sensorId){
-            index = i;
-            break;
-          }
-        }
-
-        if(index !== -1){//found in removed features
-          let replot = removedSensorFeatures.splice(index,1);//returns array
-          sensorsFeatures.push(replot[0]);
-          mapModule.addSensor(replot[0]);
-        }
-      }
-    });
-  };
-
   function filterFrequency(){
-    // alert("filtering freq: "+$scope.freqSlider.value);
-    Historical.filterFrequency($scope.freqSlider.value)
-    .then(function(res){
-      console.log(res.data.message);
-    });
+    console.log("filter frequency "+$scope.freqSlider.value);
   };
+
+  function filterSensor(id){
+    console.log("filter sensor "+id);
+  };  
 
 });
