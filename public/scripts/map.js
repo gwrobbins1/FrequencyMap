@@ -25,11 +25,13 @@ var mapModule = (function(){
 		sensorData.forEach(function(sensor){						
 			// let loc = sensor.location;
 			if(sensor.isActive){
-				let loc = ol.proj.transform(sensor.location,'EPSG:4326','EPSG:3857');
+				let loc = [sensor.Longitude,sensor.Latitude];
+				loc = ol.proj.transform(loc,'EPSG:4326','EPSG:3857');
+				
 				let feature = new ol.Feature({
 					geometry:new ol.geom.Point(loc)
 				});
-				feature.setId(sensor.id);
+				feature.setId(sensor.SID);
 				feature.setStyle(sensorStyle);
 				features.push(feature);
 			}
@@ -114,12 +116,14 @@ var mapModule = (function(){
 		let features = [];
 		sensorArray.forEach(function(sensor){
 			if(sensor.isActive){
-				let loc = ol.proj.transform(sensor.location,'EPSG:4326','EPSG:3857');
+				let loc = [sensor.Longitude,sensor.Latitude];
+				loc = ol.proj.transform(loc,'EPSG:4326','EPSG:3857');
+
 				let feature = new ol.Feature({
 					geometry:new ol.geom.Point(loc),
-					weight:(sensor.readings[value] / 100)
+					weight:(sensor.READINGS / 100)
 				});
-				feature.setId(sensor.id);
+				feature.setId(sensor.SID);
 				features.push(feature);
 			}
 		});

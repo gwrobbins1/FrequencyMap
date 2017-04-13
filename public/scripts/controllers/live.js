@@ -9,7 +9,9 @@
  */
 angular.module('LiveController',["LiveService"])
 .controller('LiveCtrl',function ($scope, $rootScope, Live) {
+  //stop polling when no sensors are selected or 0MHz is selected on slider
   let readingsPoll;
+
   $scope.sensors = [];
   $scope.filters = {
     sensors : [],
@@ -32,8 +34,8 @@ angular.module('LiveController',["LiveService"])
     $scope.filters.frequency = hiVal;
     if(hiVal !== 0){
       pollForReadings();
-      readingsPoll = setInterval(pollForReadings,1e3);
-      $rootScope.intervalIDs.push(readingsPoll);      
+      readingsPoll = setInterval(pollForReadings,1e3);//per second
+      $rootScope.intervalIDs.push(readingsPoll);
     }else{//stop polling if frequency = 0
       if(readingsPoll !== undefined){
         let index = $rootScope.intervalIDs.indexOf(readingsPoll);
@@ -78,7 +80,9 @@ angular.module('LiveController',["LiveService"])
     });
   };
   getSensors();//gets sensors on initial page load
-  
+
+  let sensorsFeatures = [];
+  let heatmapFeatures = [];  
   function pollForReadings(){
     Live.getReadings($scope.filters)
     .then(function(res){
@@ -94,6 +98,12 @@ angular.module('LiveController',["LiveService"])
             }
           }
         });
+
+       if(sensorsFeatures.length === 0){
+          sensorsFeatures = mapModule.makeSensorFeatureArray($scope.sensors);            
+          mapModule.addSensorLayer(sensorsFeatures);            
+        }//else would be used if the sensors are changing location.
+        heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value,$scope.sensors);        
       }
     });
   };  
@@ -101,40 +111,20 @@ angular.module('LiveController',["LiveService"])
   let sensorPoll = setInterval(getSensors,60e3);//update sensors every minute
   $rootScope.intervalIDs.push(sensorPoll);
 
-  // let sensorsFeatures = [];
-  // let heatmapFeatures = [];
-  // var pollServer = function(){
-  //   Live.get()
-  //   .then(function(res){
-  //     $scope.sensors = res.data;
-  //     $scope.sensors.forEach(function(sensor){
-  //       let val = $scope.freqSlider.value;
-  //       let strength = sensor.readings[$scope.freqSlider.value];
-  //       sensor.readings = {};
-  //       sensor.readings[val] = strength;
-  //     });
-  //     if(sensorsFeatures.length === 0){
-  //       sensorsFeatures = mapModule.makeSensorFeatureArray($scope.sensors);            
-  //       mapModule.addSensorLayer(sensorsFeatures);            
-  //     }//else would be used if the sensors are changing location.
-  //     heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value,$scope.sensors);
-  //   });
-  // };
+  function filterHeatmap(sensorId){
+    let index = -1;
+    for(let i =0 ; i < heatmapFeatures.length; i++){
+      if(heatmapFeatures[i].getId() === sensorId){
+        index = i;
+        break;
+      }
+    }
 
-  // function filterHeatmap(sensorId){
-  //   let index = -1;
-  //   for(let i =0 ; i < heatmapFeatures.length; i++){
-  //     if(heatmapFeatures[i].getId() === sensorId){
-  //       index = i;
-  //       break;
-  //     }
-  //   }
-
-  //   if(index !== -1){
-  //     mapModule.removeSensorHeatmap(heatmapFeatures[index]);
-  //     heatmapFeatures.splice(index,1);
-  //   }
-  // };
+    if(index !== -1){
+      mapModule.removeSensorHeatmap(heatmapFeatures[index]);
+      heatmapFeatures.splice(index,1);
+    }
+  };
 
   let removedSensorFeatures = [];//needed to replot when user reactivates sensor
   $scope.filter = function(sensorId){
@@ -146,8 +136,6 @@ angular.module('LiveController',["LiveService"])
     }else{
       $scope.filters.sensors.push(sensorId);
     }
-
-    // if($scope.filters.frequency !== 0){pollForReadings($scope.filters);}
 
     // Live.filter(sensorId)
     // .then(function(res){
