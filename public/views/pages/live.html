@@ -56,11 +56,11 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="reading in readings" ng-if="sensor.isActive != false">
-							<td>Sensor-{{ reading.Sensors_SID }}</td>
-							<td>{{reading.TIME}}</td>
+						<tr ng-repeat="sensor in sensors" ng-if="sensor.isActive != false">
+							<td>Sensor-{{ sensor.SID }}</td>
+							<td>{{sensor.TIME}}</td>
 							<td>{{ freqSlider.value }}</td>
-							<td>{{ reading.READINGS }}</td>
+							<td>{{ sensor.READINGS }}</td>
 					</tbody>
 				</table>
 

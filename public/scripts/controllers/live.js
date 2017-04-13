@@ -9,9 +9,8 @@
  */
 angular.module('LiveController',["LiveService"])
 .controller('LiveCtrl',function ($scope, $rootScope, Live) {
-  let polling = false;
+  let readingsPoll;
   $scope.sensors = [];
-  $scope.readings = [];
   $scope.filters = {
     sensors : [],
     frequency : 0
@@ -33,14 +32,13 @@ angular.module('LiveController',["LiveService"])
     $scope.filters.frequency = hiVal;
     if(hiVal !== 0){
       pollForReadings();
-      polling = true;
+      readingsPoll = setInterval(pollForReadings,1e3);
+      $rootScope.intervalIDs.push(readingsPoll);      
     }else{//stop polling if frequency = 0
-      polling = false;
       if(readingsPoll !== undefined){
         let index = $rootScope.intervalIDs.indexOf(readingsPoll);
         $rootScope.intervalIDs.splice(index,1);
         clearInterval(readingsPoll);
-        readingsPoll = undefined;
       }
     }
   };
@@ -85,17 +83,23 @@ angular.module('LiveController',["LiveService"])
     Live.getReadings($scope.filters)
     .then(function(res){
       if(res.data.length > 0){
-        $scope.readings = res.data;
-        if(polling){pollForReadings();}
+        // console.log(res.data);
+        let numSensors = $scope.sensors.length;
+        res.data.forEach(function(sensorReading){
+          for(let i=0;i<numSensors;i++){
+            if($scope.sensors[i].SID === sensorReading.Sensors_SID){
+              $scope.sensors[i].TIME = sensorReading.TIME;
+              $scope.sensors[i].READINGS = sensorReading.READINGS;
+              break;
+            }
+          }
+        });
       }
     });
   };  
   
   let sensorPoll = setInterval(getSensors,60e3);//update sensors every minute
   $rootScope.intervalIDs.push(sensorPoll);
-
-  // let readingsPoll = setInterval(pollForReadings,1e3);
-  // $rootScope.intervalIDs.push(readingsPoll);
 
   // let sensorsFeatures = [];
   // let heatmapFeatures = [];
