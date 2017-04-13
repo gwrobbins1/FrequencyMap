@@ -22,17 +22,21 @@ module.exports = function(app,express,config){
 	apiRouter.route("/live/readings")
 	.post(function(req,res) {
 		var freq = req.body.frequency;
-		var sensors = req.body.sensors;
+		var filteredSensors = req.body.sensors;
 
 		console.log("received request :");
 		console.log("request freq: "+freq);
-		if(sensors.length > 0){
-			sensors.forEach(function(sensor){
+		if(filteredSensors.length > 0){
+			filteredSensors.forEach(function(sensor){
 				console.log("request sensor id: "+sensor);
 			});
 		}
 
-		res.json({"message":"received filtered request"});
+		db.getLiveReadings(freq,filteredSensors,function(readings){
+			res.json(readings);
+		});
+
+		// res.json({"message":"received filtered request"});
 	})
 
 	apiRouter.route("/historical")

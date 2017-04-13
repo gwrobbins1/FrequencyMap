@@ -7,7 +7,6 @@ var dbUtils = (function(){
 	var init = function(config){
 		configuration = config;
 		pool = mysql.createPool({
-			waitForConnections : false,
 			multipleStatements : true,
 			connectionLimit:100,
 			host:configuration.mySqlHost,
@@ -58,30 +57,28 @@ var dbUtils = (function(){
 		});
 	};
 
-	var insertSensors = function(sensorArray){
+	var getLiveReadings = function(freq,filteredSensors,next){
 		pool.getConnection(function(err,connection){
 			if(err){console.log(err);}
 			else{
-				if(connection !== undefined){
-		     	console.log("inserting sensors");
-					connection.query(
-						{
-							sql:"INSERT INTO Sensors (SID,Latitude,Longitude) VALUES ?;",
-							values:[sensorArray]
+				if(filteredSensors.length === 0){
+					connection.query({
+							sql:"SELECT Sensors_SID,TIME,READINGS FROM Live WHERE Frequency = ?;",
+							values:freq
 						},
-						function(err,results,fields){					
+						function(err,res,fields){
 							if(err){
-								// console.log(err);
-								console.log("Sensor are already in DB.");
+								console.log(err);
+							}else{
+								close(connection);
+								console.log("res len: "+res.length);
+								next(res);
 							}
-							else{console.log("Inserted "+results.affectedRows+" sensors into DB.");}
-							close(connection);
 						}
-					);			
-				}else{console.log("connection is undefined");}				
+					);
+				}
 			}
-		});		
-
+		});
 	};
 
 	var close = function(connection){
@@ -92,7 +89,7 @@ var dbUtils = (function(){
 	return {
 		init : init,
 		getSensors : getSensors,
-		close : close
+		getLiveReadings : getLiveReadings,
 	};
 })();
 

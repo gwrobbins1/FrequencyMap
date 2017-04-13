@@ -9,7 +9,9 @@
  */
 angular.module('LiveController',["LiveService"])
 .controller('LiveCtrl',function ($scope, $rootScope, Live) {
+  let polling = false;
   $scope.sensors = [];
+  $scope.readings = [];
   $scope.filters = {
     sensors : [],
     frequency : 0
@@ -31,7 +33,9 @@ angular.module('LiveController',["LiveService"])
     $scope.filters.frequency = hiVal;
     if(hiVal !== 0){
       pollForReadings();
+      polling = true;
     }else{//stop polling if frequency = 0
+      polling = false;
       if(readingsPoll !== undefined){
         let index = $rootScope.intervalIDs.indexOf(readingsPoll);
         $rootScope.intervalIDs.splice(index,1);
@@ -76,21 +80,22 @@ angular.module('LiveController',["LiveService"])
     });
   };
   getSensors();//gets sensors on initial page load
-
+  
   function pollForReadings(){
-    if($scope.filters.frequency !== 0){
-      Live.getReadings($scope.filters)
-      .then(function(res){
-        console.log(res.data);
-      });
-    }
+    Live.getReadings($scope.filters)
+    .then(function(res){
+      if(res.data.length > 0){
+        $scope.readings = res.data;
+        if(polling){pollForReadings();}
+      }
+    });
   };  
   
   let sensorPoll = setInterval(getSensors,60e3);//update sensors every minute
   $rootScope.intervalIDs.push(sensorPoll);
 
-  let readingsPoll = setInterval(pollForReadings,10e3);
-  $rootScope.intervalIDs.push(readingsPoll);
+  // let readingsPoll = setInterval(pollForReadings,1e3);
+  // $rootScope.intervalIDs.push(readingsPoll);
 
   // let sensorsFeatures = [];
   // let heatmapFeatures = [];
@@ -138,7 +143,7 @@ angular.module('LiveController',["LiveService"])
       $scope.filters.sensors.push(sensorId);
     }
 
-    if($scope.filters.frequency !== 0){pollForReadings($scope.filters);}
+    // if($scope.filters.frequency !== 0){pollForReadings($scope.filters);}
 
     // Live.filter(sensorId)
     // .then(function(res){
