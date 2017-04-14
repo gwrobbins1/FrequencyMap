@@ -11,7 +11,7 @@
 angular.module('AboutController',[])
   .controller('AboutCtrl', function ($rootScope) {
 	  //stop polling server for data
-	  if($rootScope.intervalIDs.length > 0){
+	  if($rootScope.intervalIDs && $rootScope.intervalIDs.length > 0){
 	    $rootScope.intervalIDs.forEach(function(id){
 	      clearInterval( id );
 	    });

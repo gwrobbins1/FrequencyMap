@@ -10,6 +10,18 @@
 
 angular.module('HistoricalController',['HistoricalService'])
   .controller('HistoricalCtrl', function ($scope,$rootScope,Historical) {
+    if($rootScope.intervalIDs === undefined){
+      $rootScope.intervalIDs = [];
+    }else{
+      //stop polling server for data
+      if($rootScope.intervalIDs.length > 0){
+        $rootScope.intervalIDs.forEach(function(id){
+          clearInterval( id );
+        });
+        $rootScope.intervalIDs = [];
+      }
+    }
+    
   	$scope.freqSlider = {
   		value:0,
   		options:{

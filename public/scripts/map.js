@@ -17,7 +17,7 @@ var mapModule = (function(){
 
 		let sensorStyle = new ol.style.Style({
 			image: new ol.style.Circle({
-				radius:5,
+				radius:2,
 				fill : new ol.style.Fill({color: [0,0,0]})
 			})
 		});
@@ -145,16 +145,16 @@ var mapModule = (function(){
 				}),
 				radius:16,
 				// blur:0,
-				gradient:['#0000FF',
-						  '#00FFFF',
-						  '#11f769',
-						  '#15542d',
-						  '#FFFF00',
-						  '#FF0000',
-						  '#800000',
-						  '#660066',
-						  '#cc00cc',
-						  '#ffffff']
+				gradient:['#f8ff00',
+						  '#e5ec00',
+						  '#bdc200',
+						  '#ffaa00',
+						  '#FF950A',
+						  '#FF8300',
+						  '#FF680A',
+						  '#ff0000',
+						  '#c92c2c',
+						  '#af0000']
 			});
 
 			map.addLayer(heatMapLayer);

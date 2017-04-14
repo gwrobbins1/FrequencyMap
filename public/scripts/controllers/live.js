@@ -12,6 +12,18 @@ angular.module('LiveController',["LiveService"])
   //stop polling when no sensors are selected or 0MHz is selected on slider
   let readingsPoll;
 
+  if($rootScope.intervalIDs === undefined){
+    $rootScope.intervalIDs = [];
+  }else{
+    //stop polling server for data
+    if($rootScope.intervalIDs.length > 0){
+      $rootScope.intervalIDs.forEach(function(id){
+        clearInterval( id );
+      });
+      $rootScope.intervalIDs = [];
+    }
+  }
+
   $scope.sensors = [];
   $scope.filters = {
     sensors : [],
@@ -128,6 +140,7 @@ angular.module('LiveController',["LiveService"])
 
   let removedSensorFeatures = [];//needed to replot when user reactivates sensor
   $scope.filter = function(sensorId){
+    console.log("filtering sensor: "+sensorId);
     let filteredSensors = $scope.filters.sensors;
 
     if(filteredSensors.includes(sensorId)){

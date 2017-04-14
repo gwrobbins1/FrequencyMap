@@ -1,0 +1,8 @@
+-live:
+	-format date in table
+	x-fix bug when filtering sensors
+	x-format heatmap key
+	x-fix refreshing page issue
+
+-historical
+	-

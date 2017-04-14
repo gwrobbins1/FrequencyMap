@@ -71,7 +71,21 @@ var dbUtils = (function(){
 								console.log(err);
 							}else{
 								close(connection);
-								console.log("res len: "+res.length);
+								// console.log("res len: "+res.length);
+								next(res);
+							}
+						}
+					);
+				}else{
+					connection.query({
+							sql:"SELECT Sensors_SID,TIME,READINGS FROM Live WHERE Frequency = ? and Sensors_SID NOT IN (?)",
+							values:[freq,filteredSensors]
+						},
+						function(err,res,fields){
+							if(err){
+								console.log(err);
+							}else{
+								close(connection);
 								next(res);
 							}
 						}

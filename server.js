@@ -25,7 +25,7 @@ fs.readFile('./config.properties','utf8',function(err,data){
 	var apiRouter = require("./app/routes/api")(app,express,config);
 	app.use("/api", apiRouter);
 	app.get("*",function(req,res){
-		res.sendFile(path.join(__dirname+"/public/views/index.html"));
+		res.sendFile(path.join(__dirname+"/public/index.html"));
 	});
 	var port = parseInt(config['port']);
 	app.listen( port );
