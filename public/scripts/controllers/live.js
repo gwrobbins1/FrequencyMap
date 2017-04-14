@@ -137,36 +137,32 @@ angular.module('LiveController',["LiveService"])
       $scope.filters.sensors.push(sensorId);
     }
 
-    // Live.filter(sensorId)
-    // .then(function(res){
-    //   console.log(res.data);
-      // filterHeatmap(sensorId);
-      // let index = -1;
-      // for(var i=0; i<sensorsFeatures.length;i++){
-      //   if(sensorsFeatures[i].getId() === sensorId){
-      //     index = i;
-      //     break;
-      //   }
-      // }
-      // if(index !== -1){//found in sensorFeatures
-      //   let del = sensorsFeatures.splice(i,1);//returns an array
-      //   removedSensorFeatures.push(del[0]);
-      //   mapModule.removeSensor(del[0]);
-      // }else{//index == -1, sensor not found in sensorFeatures
-      //   //check if sensor is in removed features so we can replot
-      //   for(i = 0; i<removedSensorFeatures.length;i++){
-      //     if(removedSensorFeatures[i].getId() === sensorId){
-      //       index = i;
-      //       break;
-      //     }
-      //   }
+    filterHeatmap(sensorId);
+    let index = -1;
+    for(var i=0; i<sensorsFeatures.length;i++){
+      if(sensorsFeatures[i].getId() === sensorId){
+        index = i;
+        break;
+      }
+    }
+    if(index !== -1){//found in sensorFeatures
+      let del = sensorsFeatures.splice(i,1);//returns an array
+      removedSensorFeatures.push(del[0]);
+      mapModule.removeSensor(del[0]);
+    }else{//index == -1, sensor not found in sensorFeatures
+      //check if sensor is in removed features so we can replot
+      for(i = 0; i<removedSensorFeatures.length;i++){
+        if(removedSensorFeatures[i].getId() === sensorId){
+          index = i;
+          break;
+        }
+      }      
 
-      //   if(index !== -1){//found in removed features
-      //     let replot = removedSensorFeatures.splice(index,1);//returns array
-      //     sensorsFeatures.push(replot[0]);
-      //     mapModule.addSensor(replot[0]);
-      //   }
-      // }
-    // });
+      if(index !== -1){//found in removed features
+        let replot = removedSensorFeatures.splice(index,1);//returns array
+        sensorsFeatures.push(replot[0]);
+        mapModule.addSensor(replot[0]);
+      }
+    }
   };
 });
