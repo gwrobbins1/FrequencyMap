@@ -7,8 +7,8 @@ var mapModule = (function(){
 			})
 		],
 		view: new ol.View({
-			center: ol.proj.fromLonLat([-81.2,28.6]),
-			zoom:15
+			center: ol.proj.fromLonLat([-81.2,28.601]),
+			zoom:16
 		})
 	});
 
@@ -143,7 +143,7 @@ var mapModule = (function(){
 				source: new ol.source.Vector({
 					features:new ol.Collection(features)					
 				}),
-				radius:16,
+				radius:20,
 				// blur:0,
 				gradient:['#f8ff00',
 						  '#e5ec00',

@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <string>
 #include <cmath>
+#include <fstream>
 #include "json.hpp"
 
 using namespace std;
@@ -213,16 +214,17 @@ MeasuredPoint getCenter(std::vector<MeasuredPoint> MeasuredPoints)
 }
 
 
-std::vector <MeasuredPoint>  floodFill(MeasuredPoint current, double interval, std::vector<MeasuredPoint> sensorLoc, std::vector <MeasuredPoint> estimatedPoints)
+std::vector <MeasuredPoint> floodFill(MeasuredPoint current, double interval, std::vector<MeasuredPoint> sensorLoc, std::vector <MeasuredPoint> estimatedPoints)
 {
 	double yMax, yMin, xMax, xMin;
 	double i, j;
 	unsigned int n;
+	MeasuredPoint temp;
 	yMax = sensorLoc.at(0).y;
 	yMin = sensorLoc.at(0).y;
 	xMax = sensorLoc.at(0).x;
 	xMin = sensorLoc.at(0).x;
-	for (n = 1; n < sensorLoc.size(); n++) 
+	for (n = 1; n < sensorLoc.size(); n++)
 	{
 		if (sensorLoc.at(n).x > xMax)
 			xMax = sensorLoc.at(n).x;
@@ -233,99 +235,24 @@ std::vector <MeasuredPoint>  floodFill(MeasuredPoint current, double interval, s
 		if (sensorLoc.at(n).y < yMin)
 			yMin = sensorLoc.at(n).y;
 	}
-	i = current.x;
-	j = current.y;
-	MeasuredPoint temp;
 
-
-	while (i<=xMax) 
+	for (i = xMin; i < xMax; i = i + interval) 
 	{
-		temp.x = i;
-		
-		if (isInside(sensorLoc, sensorLoc.size(), temp)) 
+		for (j = yMin; j < yMax; j = j + interval) 
 		{
-			estimatedPoints.push_back(temp);
-		}
-		else 
-		{
-			
-		}
-		temp.y = current.y;
-		while (j<=yMax) 
-		{
+			temp.x = i;
 			temp.y = j;
-			if (isInside(sensorLoc, sensorLoc.size(), temp)) 
+			if (isInside(sensorLoc, sensorLoc.size(), temp) )
 			{
 				estimatedPoints.push_back(temp);
 			}
-			else 
-			{
 				
-			}
-			j = j + interval;
 		}
-		temp.y = current.y-interval;
-		while (j >= yMin) 
-		{
-			temp.y = j;
-			if (isInside(sensorLoc, sensorLoc.size(), temp)) 
-			{
-				estimatedPoints.push_back(temp);
-			}
-			else 
-			{
-				
-			}
-			j = j - interval;
-		}
-		i = i + interval;
 	}
 
-	i = current.x - interval;
-	j = current.y;
-	while (i <= xMin)
-	{
-		temp.x = i;
 
-		if (isInside(sensorLoc, sensorLoc.size(), temp))
-		{
-			estimatedPoints.push_back(temp);
-		}
-		else
-		{
-			
-		}
-		temp.y = current.y;
-		while (j <= yMax)
-		{
-			temp.y = j;
-			if (isInside(sensorLoc, sensorLoc.size(), temp))
-			{
-				estimatedPoints.push_back(temp);
-			}
-			else
-			{
-				
-			}
-			j = j + interval;
-		}
-		temp.y = current.y - interval;
-		while (j >= yMin)
-		{
-			temp.y = j;
-			if (isInside(sensorLoc, sensorLoc.size(), temp))
-			{
-				estimatedPoints.push_back(temp);
-			}
-			else
-			{
-				
-			}
-			j = j - interval;
-		}
 
-		i = i - interval;
-	}
+
 	return estimatedPoints;
 }
 
@@ -400,7 +327,6 @@ int main(int argc, char* argv[])
 
 	unsigned int i;
 	int x;
-
 	
 	std::vector<MeasuredPoint>sensors;
 	MeasuredPoint temp;
@@ -418,54 +344,43 @@ int main(int argc, char* argv[])
 	
 	//cout << std::fixed << sensors.at(0).x << " " << sensors[0].y <<" " <<sensors[0].measuredStrength << "\n\n\n\n";
 
-
-	
-
-	
-	
-	//std::vector<MeasuredPoint> 
-		// sensors = { { 28.600367,-81.198041, 60.0 } ,{ 28.600693, -81.198229, 35.0 } ,{ 28.600893, -81.197376, 45.0 } ,{ 28.600700, -81.197134, 22.0 } };
-	//std::vector<MeasuredPoint> sensors = { { 0, 0, 60.0 } ,{ 0,10, 35.0 } ,{ 10, 10, 45.0 } ,{ 10,0, 22.0 },{ 5, 5, 22 } };
-	// sensors = {{-81.1976,28.6033,66},{-81.1982,28.6047,88},{-81.1992,28.6016,23},{-81.1972,28.6020,44},{-81.2023,28.6037,33}};	
+	// std::vector<MeasuredPoint> sensors = { { 28.600367,-81.198041, 60.0 } ,{ 28.600693, -81.198229, 35.0 } ,{ 28.600893, -81.197376, 45.0 } ,{ 28.600700, -81.197134, 22.0 } };
+	// std::vector<MeasuredPoint> sensors = { { 0, 0, 60.0 } ,{ 0,10, 35.0 } ,{ 10, 10, 45.0 } ,{ 10,0, 22.0 },{ 5, 5, 22 } };
 	std::vector <MeasuredPoint> estimatedPoints;
 	std::vector<MeasuredPoint> polygon = convex_hull(sensors);
 	
 
 
 	MeasuredPoint center = getCenter(polygon);
-	//cout << "(" << std::fixed << center.x << "," << center.y << ")\n\n";
+	// cout << "(" << std::fixed << center.x << "," << center.y << ")\n\n";
 
-	double interval = 0.00001;
+	double interval = 0.0005;
 
 	estimatedPoints = floodFill(center, interval, sensors, estimatedPoints);
-
 	std::vector<MeasuredPoint> list = interpolation(sensors, estimatedPoints);
-
-	// for (i = 0; i<list.size(); i++)
-	// {
-	// 	// if (i != 0) {
-	// 	// 	cout << ",";
-	// 	// }
-	// 	cout << "{"<<"lat:'" << std::fixed << list.at(i).x << "',lon:'" << list.at(i).y << "," << "'str:'"<< list.at(i).measuredStrength << "}\n";
-	// }
 
 	json packet,j;
 	std::vector<json> v;
 	for (i = 0; i<list.size(); i++)
 	{
-
-		// cout << std::fixed << list.at(i).x  << " ";
-		// cout << std::fixed << list.at(i).y << " ";
-		// cout << std::fixed << list.at(i).measuredStrength << "\n";
-
 		j["lat"] = list.at(i).x;
 		j["lon"] = list.at(i).y;
-		j["str"] = list.at(i).measuredStrength;
-
+		j["str"] = list.at(i).measuredStrength;	
 		v.push_back(j);
+		// cout << i << ": ";
+		// cout << std::fixed << list.at(i).x << " ";
+		// cout << std::fixed << list.at(i).y << " ";
+		// cout << std::fixed << list.at(i).measuredStrength << "\n";
 	}
 	packet["interpolation"] = v;
-	cout << packet.dump();
+	std::ofstream outputFile;
+	outputFile.open("estimatedPoints.json");
+	if (outputFile.is_open()) {
+		outputFile << packet.dump();
+	}
+	outputFile.close();
+	 
+	//cout << packet.dump();
 	// cin >> x;
 
 	return 0;

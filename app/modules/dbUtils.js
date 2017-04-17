@@ -99,11 +99,13 @@ var dbUtils = (function(){
 			if(err){console.log(err);}
 			else{
 				connection.query({
-					sql:"SELECT * FROM Recorded_data WHERE TIME BETWEEN ? AND ? and Frequency = ?",
+					sql:"SELECT * FROM Recorded_data rd JOIN Sensors s on rd.Sensors_SID=s.SID WHERE TIME BETWEEN ? AND ? and Frequency = ?",
 					values:[start,end,freq]
 				},function(error,res,fields){
 					if(error){console.log(error);}
 					else{
+
+
 						close(connection);
 						next(res);
 					}
