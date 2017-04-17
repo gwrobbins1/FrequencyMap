@@ -28,7 +28,7 @@ angular.module('LiveController',["LiveService"])
   $scope.filters = {
     sensors : [],
     frequency : 0
-  }
+  };
 
 	$scope.freqSlider = {
 		value:0,
@@ -89,6 +89,8 @@ angular.module('LiveController',["LiveService"])
           });
         }
       }
+    },function(err){
+      console.log(err);
     });
   };
   getSensors();//gets sensors on initial page load
@@ -98,10 +100,11 @@ angular.module('LiveController',["LiveService"])
   function pollForReadings(){
     Live.getReadings($scope.filters)
     .then(function(res){
-      if(res.data.length > 0){
+      // if(res.data.length > 0){
+      if(res.data.readings.length > 0){        
         // console.log(res.data);
         let numSensors = $scope.sensors.length;
-        res.data.forEach(function(sensorReading){
+        res.data.readings.forEach(function(sensorReading){
           for(let i=0;i<numSensors;i++){
             if($scope.sensors[i].SID === sensorReading.Sensors_SID){
               $scope.sensors[i].TIME = sensorReading.TIME;
@@ -117,6 +120,11 @@ angular.module('LiveController',["LiveService"])
         }//else would be used if the sensors are changing location.
         heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value,$scope.sensors);        
       }
+
+      let interpolationData = res.data.interpolation;
+      mapModule.plotInterpolation(interpolationData);
+    },function(err){
+      console.log(err);
     });
   };  
   

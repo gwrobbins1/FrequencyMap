@@ -27,6 +27,7 @@ fs.readFile('./config.properties','utf8',function(err,data){
 	app.get("*",function(req,res){
 		res.sendFile(path.join(__dirname+"/public/index.html"));
 	});
+
 	var port = parseInt(config['port']);
 	app.listen( port );
 	console.log("server started on port: "+port);

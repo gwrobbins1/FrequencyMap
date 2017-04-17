@@ -50,8 +50,7 @@ var dbUtils = (function(){
 								}							
 							}
 						);						
-					}					
-
+					}
 				}
 			}
 		});
@@ -95,6 +94,24 @@ var dbUtils = (function(){
 		});
 	};
 
+	var getHistoricalReadings = function(freq,start,end,next){
+		pool.getConnection(function(err,connection){
+			if(err){console.log(err);}
+			else{
+				connection.query({
+					sql:"SELECT * FROM Recorded_data WHERE TIME BETWEEN ? AND ? and Frequency = ?",
+					values:[start,end,freq]
+				},function(error,res,fields){
+					if(error){console.log(error);}
+					else{
+						close(connection);
+						next(res);
+					}
+				});
+			}
+		});
+	};
+
 	var close = function(connection){
 		connection.release();
 		console.log("DB connection released");
@@ -104,6 +121,7 @@ var dbUtils = (function(){
 		init : init,
 		getSensors : getSensors,
 		getLiveReadings : getLiveReadings,
+		getHistoricalReadings : getHistoricalReadings
 	};
 })();
 

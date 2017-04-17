@@ -164,6 +164,31 @@ var mapModule = (function(){
 		return features;
 	};
 
+	var plotInterpolation = function(data){
+		if(data){//could be undefined. is an array			
+			let heatmapSrc;
+			map.getLayers().forEach(function(layer){
+				if(layer.get('name') === "heatmap"){					
+					heatmapSrc = layer.getSource();					
+				}
+			});
+
+			if(heatmapSrc){
+				data.forEach(function(point){
+					let loc = [point.lon,point.lat];
+					loc = ol.proj.transform(loc,'EPSG:4326','EPSG:3857');
+
+					let feature = new ol.Feature({
+						geometry:new ol.geom.Point(loc),
+						weight:(point.str / 100)
+					});
+
+					heatmapSrc.addFeature(feature);
+				});
+			}
+		}
+	};
+
 	return {
 		makeSensorFeatureArray : makeSensorFeatureArray,
 		addSensorLayer : addSensorLayer,
@@ -171,6 +196,7 @@ var mapModule = (function(){
 		addSensor : addSensor,
 		plotHeatmap : plotHeatmap,
 		removeSensorHeatmap : removeSensorHeatmap,
-		removeSensorLayer : removeSensorLayer
+		removeSensorLayer : removeSensorLayer,
+		plotInterpolation : plotInterpolation
 	};
 })();

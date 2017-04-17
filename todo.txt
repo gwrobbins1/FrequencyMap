@@ -6,3 +6,7 @@
 
 -historical
 	-
+
+
+--Note:
+	g++ flags -std=c++11	

@@ -36,21 +36,33 @@
 								data-clear-callback="timePicker.onClearTimePicker()"></wy-time-picker>
 			</div>
 			<div class="col-md-8">
-				<div id="map" class="map" style="height:500px; width: 700px; border: 1px solid black">
+				<div id="map" class="map" style="height:500px; width: 700px; border: 1px solid black"></div>
+				<div id="key">
+					<div id="lowest" class="color" style="background-color: #f8ff00;"></div>					
+					<div id="lowest-low" class="color" style="background-color:#e5ec00; "></div>
+					<div id="lowest-mid" class="color" style="background-color:#bdc200; "></div>
+					<div id="lowest-high" class="color" style="background-color:#ffaa00; "></div>
+					<div id="mid" class="color" style="background-color:#FF950A; "></div>
+					<div id="mid-high" class="color" style="background-color:#FF8300; "></div>
+					<div id="high-low" class="color" style="background-color:#FF680A; "></div>
+					<div id="high-mid" class="color" style="background-color:#ff0000; "></div>
+					<div id="high-high" class="color" style="background-color:#c92c2c; "></div>
+					<div id="highest" class="color" style="background-color:#af0000; "></div>
 				</div>
-				<div id="key">				
-					<div id="lowest" class="color" style="background-color: #0000FF;"></div>					
-					<div id="lowest-low" class="color" style="background-color:#00FFFF; "></div>
-					<div id="lowest-mid" class="color" style="background-color:#11f769; "></div>
-					<div id="lowest-high" class="color" style="background-color:#15542d; "></div>
-					<div id="mid" class="color" style="background-color:#FFFF00; "></div>
-					<div id="mid-high" class="color" style="background-color:#FF0000; "></div>
-					<div id="high-low" class="color" style="background-color:#800000; "></div>
-					<div id="high-mid" class="color" style="background-color:#660066; "></div>
-					<div id="high-high" class="color" style="background-color:#cc00cc; "></div>
-					<div id="highest" class="color" style="background-color:#ffffff; "></div>
-				</div>
+				<div id="key-desc">
+					<div id="lowest-desc" class="desc">>0%</div>					
+					<div id="lowest-low-desc" class="desc">>10%</div>
+					<div id="lowest-mid-desc" class="desc">>20%</div>
+					<div id="lowest-high-desc" class="desc">>30%</div>
+					<div id="mid-desc" class="desc">>40%</div>
+					<div id="mid-high-desc" class="desc">>50%</div>
+					<div id="high-low-desc" class="desc">>60%</div>
+					<div id="high-mid-desc" class="desc">>70%</div>
+					<div id="high-high-desc" class="desc">>80%</div>
+					<div id="highest-desc" class="desc">>90%</div>
+				</div>				
 			</div>			
+		</div>
 		</div>
 		<div class="row">
 			<div class="col-md-12">

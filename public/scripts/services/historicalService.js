@@ -7,7 +7,7 @@ angular.module("HistoricalService",[])
 	};
 
 	historicalFactory.getReadings = function(filters){
-		return $http.post("/api/historical/",filters);
+		return $http.post("/api/historical/readings/",filters);
 	};
 
 	return historicalFactory;
