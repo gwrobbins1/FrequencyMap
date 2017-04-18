@@ -107,9 +107,9 @@ module.exports = function(app,express,config){
 
 	apiRouter.route("/historical/readings")
 	.post(function(req,res){
-		console.log("frequency:"+req.body.freq);
-		console.log("start time:"+req.body.start);
-		console.log("end time:"+req.body.end);
+		// console.log("frequency:"+req.body.freq);
+		// console.log("start time:"+req.body.start);
+		// console.log("end time:"+req.body.end);
 
 		db.getHistoricalReadings(req.body.freq,req.body.start,req.body.end,
 			function(readings){
@@ -120,9 +120,9 @@ module.exports = function(app,express,config){
 					interpolationInput.push(sensorReadings.Longitude);
 					interpolationInput.push(sensorReadings.READINGS);
 
-					console.log("Lat"+sensorReadings.Latitude);
-					console.log("Lon"+sensorReadings.Longitude);
-					console.log("reading"+sensorReadings.Readings);
+					// console.log("Lat"+sensorReadings.Latitude);
+					// console.log("Lon"+sensorReadings.Longitude);
+					// console.log("reading"+sensorReadings.Readings);
 				});
 
 				if(!interpolating && interpolationInput.length !== 0){
@@ -130,20 +130,20 @@ module.exports = function(app,express,config){
 					const ps = spawn("interpolate.exe",interpolationInput);
 					ps.stdout.on('data',function(data){
 						interpolating = false;
-						console.log(data);
+						// console.log(data);
 					});
 					ps.stderr.on('data',function(data){
 						interpolating = false;
-						console.log(data);
+						// console.log(data);
 					});
 					ps.on('error',function(err){
 						interpolating = false;
-						console.log(err);
+						// console.log(err);
 					});
 					ps.on('close',function(code){
 						interpolating = false;
-						console.log("----code:"+code);
-						if(code === 0){							
+						// console.log("----code:"+code);
+						// if(code === 0){							
 							fs.readFile("./estimatedPoints.json",function(err,data){
 								if(err){console.log(err);}
 								else{
@@ -156,13 +156,13 @@ module.exports = function(app,express,config){
 									});
 								}
 							});
-						}else{
-							interpolating = false;
-							res.json({'readings':readings});
-						}
+						// }else{
+						// 	interpolating = false;
+						// 	res.json({'readings':readings});
+						// }
 					});
 				}else{
-					res.json(readings);
+					res.json({'readings':readings});
 				}
 			});
 	});
