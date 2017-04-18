@@ -67,7 +67,7 @@ angular.module('HistoricalController',['HistoricalService'])
     };
 
   let removedSensorFeatures = [];//needed to replot when user reactivates sensor
-  let sensorsFeatures = [];
+  let sensorFeatures = [];
   let heatmapFeatures = [];
   let previousViewDates = [];
 
@@ -121,11 +121,29 @@ angular.module('HistoricalController',['HistoricalService'])
       .then(function(res){
         //console.log(res);
         //process results
+        let readings =res.data.readings;
+        $scope.sensors = [];
+        readings.forEach(function(reading){          
+          $scope.sensors.push({
+            SID:reading.SID,
+            Latitude:reading.Latitude,
+            Longitude:reading.Longitude,
+            readings:reading.Readings,
+            timeStamp:reading.TIME,
+            isActive:true
+          });
+        });
+
+        if(sensorFeatures.length === 0){
+          sensorFeatures = mapModule.makeSensorFeatureArray($scope.sensors);
+          mapModule.addSensorLayer(sensorFeatures);
+        }
+        heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value, $scope.sensors);        
+
+        
 
         t0 = moment(t1.format());
         t1 = times.shift();
-
-        // setTimeout(loopData(t0,t1,times),1e3);//1 second delay
         loopData(t0,t1,times);
       },
       function(err){

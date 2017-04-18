@@ -62,27 +62,25 @@ module.exports = function(app,express,config){
 
 					const ps = spawn("interpolate.exe",interpolationInput);
 					ps.stdout.on('data',function(data){
-						// console.log(data);
-						// var interpJson = JSON.parse(data);
-						// console.log(interpJson);
-						// console.log("----# of objects in interpolation data "+Object.keys(interpJson.interpolation).length);						
-						// interpolating = false;
-						// res.json({'readings':readings,'interpolation':interpJson.interpolation});						
+						interpolating = false;
+						console.log(data);
 					});
 					ps.stderr.on('data',function(data){
+						interpolating = false;
 						console.log(data);
 					});
 					ps.on('error',function(err){
+						interpolating = false;
 						console.log(err);
 					});
 					ps.on('close',function(code){
+						interpolating = false;
 						if(code === 0){							
 							fs.readFile("./estimatedPoints.json",function(err,data){
 								if(err){console.log(err);}
 								else{
 									// console.log(JSON.parse(data));
 									var interpolation = JSON.parse(data);
-									interpolating = false;
 									res.json({
 										'readings':readings,
 										'interpolation':interpolation.interpolation
@@ -90,7 +88,6 @@ module.exports = function(app,express,config){
 								}
 							});
 						}else{
-							interpolating = false;
 							res.json({'readings':readings});
 						}
 					});
@@ -116,12 +113,58 @@ module.exports = function(app,express,config){
 
 		db.getHistoricalReadings(req.body.freq,req.body.start,req.body.end,
 			function(readings){
-				res.json(readings);
+				var numSensors = readings.length;
+				var interpolationInput = [];
+				readings.forEach(function(sensorReadings){
+					interpolationInput.push(sensorReadings.Latitude);
+					interpolationInput.push(sensorReadings.Longitude);
+					interpolationInput.push(sensorReadings.READINGS);
+
+					console.log("Lat"+sensorReadings.Latitude);
+					console.log("Lon"+sensorReadings.Longitude);
+					console.log("reading"+sensorReadings.Readings);
+				});
+
+				if(!interpolating && interpolationInput.length !== 0){
+					interpolating = true;
+					const ps = spawn("interpolate.exe",interpolationInput);
+					ps.stdout.on('data',function(data){
+						interpolating = false;
+						console.log(data);
+					});
+					ps.stderr.on('data',function(data){
+						interpolating = false;
+						console.log(data);
+					});
+					ps.on('error',function(err){
+						interpolating = false;
+						console.log(err);
+					});
+					ps.on('close',function(code){
+						interpolating = false;
+						console.log("----code:"+code);
+						if(code === 0){							
+							fs.readFile("./estimatedPoints.json",function(err,data){
+								if(err){console.log(err);}
+								else{
+									// console.log(JSON.parse(data));
+									var interpolation = JSON.parse(data);
+									interpolating = false;
+									res.json({
+										'readings':readings,
+										'interpolation':interpolation.interpolation
+									});
+								}
+							});
+						}else{
+							interpolating = false;
+							res.json({'readings':readings});
+						}
+					});
+				}else{
+					res.json(readings);
+				}
 			});
-		// res.json({"message":"getting historical readings"});
-		// setTimeout(function(){
-		// 	res.json({"message":"getting historical readings"});
-		// },5e3);
 	});
 
 	return apiRouter;

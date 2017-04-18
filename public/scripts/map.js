@@ -17,7 +17,7 @@ var mapModule = (function(){
 
 		let sensorStyle = new ol.style.Style({
 			image: new ol.style.Circle({
-				radius:2,
+				radius:3,
 				fill : new ol.style.Fill({color: [0,0,0]})
 			})
 		});
