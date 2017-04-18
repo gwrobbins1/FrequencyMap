@@ -22,6 +22,8 @@ angular.module('HistoricalController',['HistoricalService'])
       }
     }
     
+    //binds incoming sensors with angular 
+    //check boxes and table
     $scope.sensors = [];
     $scope.filters = {
       sensors : [],
@@ -38,7 +40,7 @@ angular.module('HistoricalController',['HistoricalService'])
   			step:1.0,
   			minLimit:0,
   			maxLimit:1700,
-        onEnd: filterFrequency
+        onChange: filterFrequency
   		}
   	};
 
@@ -113,6 +115,7 @@ angular.module('HistoricalController',['HistoricalService'])
     if(t1 !== undefined){
       previousViewDates.push(t1);
       let args = {
+          sensorFilters:$scope.filters.sensors,
           freq:$scope.filters.frequency,
           start:t0.format(),
           end:t1.format()
@@ -121,6 +124,14 @@ angular.module('HistoricalController',['HistoricalService'])
       .then(function(res){
         //console.log(res);
         //process results
+
+        let deactivated = [];
+        $scope.sensors.forEach(function(sensor){
+          if(sensor.isActive === false){
+            deactivated.push(sensor.SID);
+          }
+        });        
+
         let readings =res.data.readings;
         $scope.sensors = [];
         readings.forEach(function(reading){          
@@ -129,22 +140,24 @@ angular.module('HistoricalController',['HistoricalService'])
             Latitude:reading.Latitude,
             Longitude:reading.Longitude,
             readings:reading.Readings,
+            READINGS:reading.Readings,
             timeStamp:reading.TIME,
-            isActive:true
+            isActive:(deactivated.includes(reading.SID)) ? 
+                              false : true
           });
         });
 
+        heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value, $scope.sensors);
         if(sensorFeatures.length === 0){
           sensorFeatures = mapModule.makeSensorFeatureArray($scope.sensors);
           mapModule.addSensorLayer(sensorFeatures);
         }
-        heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value, $scope.sensors);        
-
         
 
         t0 = moment(t1.format());
         t1 = times.shift();
-        loopData(t0,t1,times);
+        setTimeout(loopData(t0,t1,times),15e3);
+        // loopData(t0,t1,times);
       },
       function(err){
         console.log(err);
@@ -152,13 +165,26 @@ angular.module('HistoricalController',['HistoricalService'])
     }
   };
 
+  function pollServer(){
+    let startDate = $scope.filters.dateRange[0];
+    let endDate = $scope.filters.dateRange[1];
+    let dateStack = generateDateTimeStack(startDate,$scope.filters.timeRange[0],
+                                          endDate, $scope.filters.timeRange[1]);    
+    let t0 = dateStack.shift();
+    previousViewDates.push(t0);
+    loopData(t0,dateStack.shift(),dateStack);
+  };
+
+
   function filterDateRange(event,picker){
-    let index = -1;//needed to remove excess data after formating
-    let startDate = event.model.startDate.format().toString();
-    index = startDate.indexOf('T');
+    let startDate = event.model.startDate;
+    startDate = moment(startDate.toString()).format();
+    let index = startDate.indexOf('T');
     startDate = startDate.substring(0,index);
 
-    let endDate = event.model.endDate.format().toString();
+    let endDate = event.model.endDate;
+    endDate = moment(endDate.toString()).format();
+
     index = endDate.indexOf('T');
     endDate = endDate.substring(0,index);
 
@@ -175,11 +201,8 @@ angular.module('HistoricalController',['HistoricalService'])
 
     if($scope.filters.frequency !== 0 && 
        $scope.filters.timeRange.length !== 0){
-      let dateStack = generateDateTimeStack(startDate,$scope.filters.timeRange[0],
-                                            endDate, $scope.filters.timeRange[1]);
-      let t0 = dateStack.shift();
-      previousViewDates.push(t0);
-      loopData(t0,dateStack.shift(),dateStack);
+
+      pollServer();
     }else{
       console.log("picked date range: "+$scope.filters.dateRange[0]+
                 " to "+$scope.filters.dateRange[0]);
@@ -201,7 +224,13 @@ angular.module('HistoricalController',['HistoricalService'])
       $scope.filters.timeRange.push(toTime);      
     }
 
-    console.log(" fromTime:"+$scope.filters.timeRange[1]+'toTime:'+$scope.filters.timeRange[0]);
+    if($scope.filters.frequency !== 0 && 
+       $scope.filters.dateRange.length !== 0){
+
+      pollServer();
+    }else{
+      console.log(" fromTime:"+$scope.filters.timeRange[1]+'toTime:'+$scope.filters.timeRange[0]);
+    }
   };
 
   function onClearTimePicker(){
@@ -211,7 +240,13 @@ angular.module('HistoricalController',['HistoricalService'])
 
   function filterFrequency(){
     $scope.filters.frequency = $scope.freqSlider.value;
-    console.log("filter frequency "+$scope.freqSlider.value);
+    if($scope.filters.frequency !== 0 && 
+       $scope.filters.dateRange.length !== 0){
+
+      pollServer();
+    }else{
+      console.log("filter frequency "+$scope.freqSlider.value);
+    }
   };
 
   function filterSensor(id){

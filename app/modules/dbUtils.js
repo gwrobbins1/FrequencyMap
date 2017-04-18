@@ -104,8 +104,6 @@ var dbUtils = (function(){
 				},function(error,res,fields){
 					if(error){console.log(error);}
 					else{
-
-
 						close(connection);
 						next(res);
 					}
