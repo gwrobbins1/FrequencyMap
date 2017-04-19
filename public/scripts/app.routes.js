@@ -35,7 +35,17 @@ angular.module("app.routes", ["ngRoute"])
         templateUrl: 'views/pages/historical.html',
         controller: 'HistoricalCtrl',
         controllerAs: 'historical'
-      })      
+      })
+      .when('/historical/histogram',{
+        templateUrl: 'views/pages/historical.html',
+        controller: 'HistoricalCtrl',
+        controllerAs: 'historical'        
+      })
+      .when('/historical/linegraph',{
+        templateUrl: 'views/pages/historical.html',
+        controller: 'HistoricalCtrl',
+        controllerAs: 'historical'        
+      })
       .otherwise({
         redirectTo: '/'
       });

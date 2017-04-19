@@ -68,10 +68,17 @@ angular.module('HistoricalController',['HistoricalService'])
       onClearTimePicker:onClearTimePicker
     };
 
+    $scope.histLabels = ['>0','>10','>20','>30','>40','>50',
+                        '>60','>70','>80','>90'];
+    $scope.lineLabels = [];
+
   let removedSensorFeatures = [];//needed to replot when user reactivates sensor
   let sensorFeatures = [];
   let heatmapFeatures = [];
   let previousViewDates = [];
+  let interupt = false;
+  let beginNext = true;
+  let checkIfBusyInterval = undefined;
 
   function filterHeatmap(sensorId){
     let index = -1;
@@ -99,49 +106,47 @@ angular.module('HistoricalController',['HistoricalService'])
     let startDate = moment(date0+" "+time0);
     let endDate = moment(date1+" "+time1);
 
-    // console.log("new date:"+newDate.format());
     while(startDate < endDate){
-      // console.log(newDate.format());      
       let temp = moment(startDate.format());
       results.push(temp);
+      // $scope.lineLabels.push(temp);
       startDate = startDate.add(5,'m');      
     }
     results.push(endDate);
-    // console.log(results);
     return results;
   };
 
   function loopData(t0,t1,times){
-    if(t1 !== undefined){
+    if(t1 !== undefined && !interupt){
       previousViewDates.push(t1);
       let args = {
-          sensorFilters:$scope.filters.sensors,
-          freq:$scope.filters.frequency,
-          start:t0.format(),
-          end:t1.format()
+        sensorFilters:$scope.filters.sensors,
+        freq:$scope.filters.frequency,
+        start:t0.format(),
+        end:t1.format()
       };
       Historical.getReadings(args)
       .then(function(res){
-        //console.log(res);
         //process results
-
         let deactivated = [];
         $scope.sensors.forEach(function(sensor){
           if(sensor.isActive === false){
             deactivated.push(sensor.SID);
           }
-        });        
+        });
 
         let readings =res.data.readings;
         $scope.sensors = [];
-        readings.forEach(function(reading){          
+        readings.forEach(function(reading){
+          let time = moment(reading.TIME).format().replace('T',' ');
+
           $scope.sensors.push({
             SID:reading.SID,
             Latitude:reading.Latitude,
             Longitude:reading.Longitude,
             readings:reading.Readings,
             READINGS:reading.Readings,
-            timeStamp:reading.TIME,
+            timeStamp:time,
             isActive:(deactivated.includes(reading.SID)) ? 
                               false : true
           });
@@ -153,26 +158,95 @@ angular.module('HistoricalController',['HistoricalService'])
           mapModule.addSensorLayer(sensorFeatures);
         }
         
-
         t0 = moment(t1.format());
         t1 = times.shift();
-        setTimeout(loopData(t0,t1,times),15e3);
+        setTimeout(loopData(t0,t1,times),1e3);
         // loopData(t0,t1,times);
       },
       function(err){
         console.log(err);
       });      
+    }else{//interupted or end of time stack
+      beginNext = true;
+      previousViewDates = [];
+      sensorFeatures = [];
+      mapModule.clearMap();
     }
-  };
+  };  
 
   function pollServer(){
+    interupt = true;
+    //get time stack for play black of sensor readings
     let startDate = $scope.filters.dateRange[0];
     let endDate = $scope.filters.dateRange[1];
     let dateStack = generateDateTimeStack(startDate,$scope.filters.timeRange[0],
                                           endDate, $scope.filters.timeRange[1]);    
-    let t0 = dateStack.shift();
-    previousViewDates.push(t0);
-    loopData(t0,dateStack.shift(),dateStack);
+    let t0 = dateStack.shift();//store first time for replaying same cycle in loop
+    // $scope.lineLabels.push(t0);
+    //get histogram data
+    //format data fiters    
+    let time0 = $scope.filters.timeRange[0]
+    time0 = time0.substring(0,2)+":"+time0.substring(2,4);
+    let date0 = startDate;
+
+    let time1 = $scope.filters.timeRange[1]
+    time1 = time1.substring(0,2)+":"+time1.substring(2,4);
+    let date1 = endDate;
+
+    startDate = moment(date0+" "+time0);
+    endDate = moment(date1+" "+time1);
+
+    let args = {
+      freq:$scope.filters.frequency,
+      start:startDate.format(),
+      end:endDate.format()
+    };
+
+    Historical.getHistogram(args)
+    .then(function(res){
+      // console.log(res.data.message);
+      let data = res.data;
+      $scope.histData = [];
+      Object.keys(data).forEach(function(key){
+        $scope.histData.push(data[key]);
+      });
+    },
+    function(err){
+      console.log(err);
+    });
+    
+    Historical.getLineGraph(args)
+    .then(function(res){
+      console.log(res.data.message);
+      // let data = res.data;
+      // $scope.lineData = [];
+      
+    },
+    function(err){
+      console.log(err);
+    });
+
+    //logic for interupting current polling loop to make new query.
+    if(beginNext){
+      beginNext = false;
+      interupt = false;
+      previousViewDates.push(t0);
+      loopData(t0,dateStack.shift(),dateStack);
+    }else{
+      if(checkIfBusyInterval === undefined){
+        checkIfBusyInterval = setInterval(function(){
+          console.log("entering interval");
+          if(beginNext){
+            beginNext = false;
+            interupt = false;
+            previousViewDates.push(t0);
+            clearInterval(checkIfBusyInterval);
+            checkIfBusyInterval = undefined;
+            loopData(t0,dateStack.shift(),dateStack);
+          }
+        },1e3);
+      }
+    }
   };
 
 
@@ -204,16 +278,14 @@ angular.module('HistoricalController',['HistoricalService'])
 
       pollServer();
     }else{
-      console.log("picked date range: "+$scope.filters.dateRange[0]+
-                " to "+$scope.filters.dateRange[0]);
+      // console.log("picked date range: "+$scope.filters.dateRange[0]+
+                // " to "+$scope.filters.dateRange[0]);
     }
   };
 
   function onApplyTimePicker(){
     let toTime = this.settings.time.toHour + this.settings.time.toMinute;
     let fromTime = this.settings.time.fromHour + this.settings.time.fromMinute;
-
-    // let timeRange ='from:'+fromTime+"-"+"to:"+toTime;
 
     if($scope.filters.timeRange.length === 0){
       $scope.filters.timeRange.push(fromTime);
@@ -229,13 +301,13 @@ angular.module('HistoricalController',['HistoricalService'])
 
       pollServer();
     }else{
-      console.log(" fromTime:"+$scope.filters.timeRange[1]+'toTime:'+$scope.filters.timeRange[0]);
+      // console.log(" fromTime:"+$scope.filters.timeRange[1]+'toTime:'+$scope.filters.timeRange[0]);
     }
   };
 
   function onClearTimePicker(){
     $scope.filters.timeRange = 0;
-    console.log("time range cancelled");
+    // console.log("time range cancelled");
   };
 
   function filterFrequency(){
@@ -245,7 +317,7 @@ angular.module('HistoricalController',['HistoricalService'])
 
       pollServer();
     }else{
-      console.log("filter frequency "+$scope.freqSlider.value);
+      // console.log("filter frequency "+$scope.freqSlider.value);
     }
   };
 
@@ -257,6 +329,6 @@ angular.module('HistoricalController',['HistoricalService'])
       $scope.filters.sensors.push(id);
     }
 
-    console.log("filter sensor "+id);
+    // console.log("filter sensor "+id);
   };
 });

@@ -112,6 +112,48 @@ var dbUtils = (function(){
 		});
 	};
 
+	var getHistoricalHistogram = function(freq,start,end,next){
+		var query =	"SELECT * FROM Recorded_Data rd JOIN Sensors s on "+
+			"rd.Sensors_SID=s.SID WHERE TIME BETWEEN ? AND ? AND Frequency = ?;";
+
+		pool.getConnection(function(err,connection){
+			if(err){console.log(err);}
+			else{
+				connection.query({
+					sql:query,
+					values:[start,end,freq]
+				},function(error,res,fields){
+					if(error){console.log(error);}
+					else{
+						close(connection);
+						next(res);
+					}
+				});
+			}
+		});
+	};	
+
+	var getLineGraph = function(freq,start,end,next){
+		var query =	"SELECT * FROM Recorded_Data rd JOIN Sensors s on "+
+			"rd.Sensors_SID=s.SID WHERE TIME BETWEEN ? AND ? AND Frequency = ?;";
+
+		pool.getConnection(function(err,connection){
+			if(err){console.log(err);}
+			else{
+				connection.query({
+					sql:query,
+					values:[start,end,freq]
+				},function(error,res,fields){
+					if(error){console.log(error);}
+					else{
+						close(connection);
+						next(res);
+					}
+				});
+			}
+		});
+	};
+
 	var close = function(connection){
 		connection.release();
 		console.log("DB connection released");
@@ -121,7 +163,9 @@ var dbUtils = (function(){
 		init : init,
 		getSensors : getSensors,
 		getLiveReadings : getLiveReadings,
-		getHistoricalReadings : getHistoricalReadings
+		getHistoricalReadings : getHistoricalReadings,
+		getHistoricalHistogram : getHistoricalHistogram,
+		getLineGraph : getLineGraph
 	};
 })();
 
