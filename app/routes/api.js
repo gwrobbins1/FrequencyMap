@@ -143,7 +143,7 @@ module.exports = function(app,express,config){
 					ps.on('close',function(code){
 						interpolating = false;
 						// console.log("----code:"+code);
-						// if(code === 0){							
+						if(code === 0){
 							fs.readFile("./estimatedPoints.json",function(err,data){
 								if(err){console.log(err);}
 								else{
@@ -156,10 +156,10 @@ module.exports = function(app,express,config){
 									});
 								}
 							});
-						// }else{
-						// 	interpolating = false;
-						// 	res.json({'readings':readings});
-						// }
+						}else{
+							interpolating = false;
+							res.json({'readings':readings});
+						}
 					});
 				}else{
 					res.json({'readings':readings});
