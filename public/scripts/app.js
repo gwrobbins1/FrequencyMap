@@ -10,6 +10,7 @@
  */
 angular
   .module('frequencyMapApp', [
+    'chart.js',
     'wingify.timePicker',
     'daterangepicker',
     'ngAnimate',

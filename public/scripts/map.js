@@ -143,7 +143,7 @@ var mapModule = (function(){
 				source: new ol.source.Vector({
 					features:new ol.Collection(features)					
 				}),
-				radius:20,
+				radius:35,
 				// blur:0,
 				gradient:['#f8ff00',
 						  '#e5ec00',
@@ -189,6 +189,15 @@ var mapModule = (function(){
 		}
 	};
 
+	var clearMap = function(){
+		map.getLayers().forEach(function(layer){
+			let src = layer.getSource();
+			src.getFeatures().forEach(function(feature){
+				src.removeFeature(feature);
+			});
+		});
+	};
+
 	return {
 		makeSensorFeatureArray : makeSensorFeatureArray,
 		addSensorLayer : addSensorLayer,
@@ -197,6 +206,7 @@ var mapModule = (function(){
 		plotHeatmap : plotHeatmap,
 		removeSensorHeatmap : removeSensorHeatmap,
 		removeSensorLayer : removeSensorLayer,
+		clearMap : clearMap,
 		plotInterpolation : plotInterpolation
 	};
 })();

@@ -167,5 +167,71 @@ module.exports = function(app,express,config){
 			});
 	});
 
+	apiRouter.route("/historical/histogram")
+	.post(function(req,res){
+		// console.log("frequency:"+req.body.freq);
+		// console.log("start time:"+req.body.start);
+		// console.log("end time:"+req.body.end);
+
+		db.getHistoricalHistogram(req.body.freq,req.body.start,req.body.end,
+			function(data){
+				var histogram = {
+					0:0,
+					1:0,
+					2:0,
+					3:0,
+					4:0,
+					5:0,
+					6:0,
+					7:0,
+					8:0,
+					9:0,
+					10:0
+				};
+				
+				data.forEach(function(stat){
+					var num = parseInt(stat.Readings/10);
+					histogram[num] += 1;
+				});
+				histogram[9] += histogram[10];
+				delete histogram[10];
+				res.json(histogram);
+				// res.json(data);
+			});
+		// res.json({"message":"received"});
+	});
+
+	apiRouter.route("/historical/linegraph")
+	.post(function(req,res){
+		// console.log("frequency:"+req.body.freq);
+		// console.log("start time:"+req.body.start);
+		// console.log("end time:"+req.body.end);
+
+		db.getLineGraph(req.body.freq,req.body.start,req.body.end,
+			function(data){
+				var labels = [];
+				var lines = {};
+				
+				data.forEach(function(stat){					
+					labels.push(stat.TIME);
+					var sids = Object.keys(lines);
+					if(sids.indexOf(stat.SID) === -1){
+						lines[stat.SID] = [];
+						lines[stat.SID].push(stat.Readings);						
+					}else{
+						lines[stat.SID].push(stat.Readings);
+
+					}
+				});
+
+				res.json({
+					labels:labels,
+					lines:lines
+				});
+				// res.json(data);
+			});		
+		// res.json({"message":"received"});
+	});
+
 	return apiRouter;
 };

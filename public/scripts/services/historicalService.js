@@ -10,5 +10,13 @@ angular.module("HistoricalService",[])
 		return $http.post("/api/historical/readings/",filters);
 	};
 
+	historicalFactory.getHistogram = function(filters){
+		return $http.post("/api/historical/histogram/",filters);
+	};
+
+	historicalFactory.getLineGraph = function(filters){
+		return $http.post("/api/historical/linegraph/",filters);
+	};
+
 	return historicalFactory;
 });
