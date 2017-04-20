@@ -1,0 +1,18 @@
+build instructions:
+-run npm install
+-run npm install bower -g
+-run bower install
+-copy ./node_modules/angular-chartsjs and ./charts to the 
+	./public/assets/libs directory
+-run build command for interpolation system
+	g++ -std=c++11 -o interpolate Source.cpp
+
+configure webserver
+-open config.properties file in text editor
+-change mySqlHost to the IP address of the MySQL server
+-change user to the MySQL user
+-change password to the MySQL password for the given user
+-change port to the an open port
+
+Start web server:
+-run node server.js
