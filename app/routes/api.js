@@ -134,7 +134,7 @@ module.exports = function(app,express,config){
 
 				if(!interpolating){
 					interpolating = true;
-					var ps = spawn("interpolate-hist.exe",interpolationInput);
+					var ps = spawn("interpolate.exe",interpolationInput);
 					ps.stdout.on('data',function(data){
 						interpolating = false;
 						// console.log(data);
@@ -172,7 +172,7 @@ module.exports = function(app,express,config){
 					while(interpolating){
 						if(!interpolating){
 							interpolating = true;
-							var ps = spawn("interpolate-hist.exe",interpolationInput);
+							var ps = spawn("interpolate.exe",interpolationInput);
 							ps.stdout.on('data',function(data){
 								interpolating = false;
 								// console.log(data);
