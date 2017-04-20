@@ -36,10 +36,10 @@ angular.module('HistoricalController',['HistoricalService'])
   		value:0,
   		options:{
   			floor:0,
-  			ceil:1700,
+  			ceil:225,
   			step:1.0,
   			minLimit:0,
-  			maxLimit:1700,
+  			maxLimit:225,
         onChange: filterFrequency
   		}
   	};
@@ -151,13 +151,16 @@ angular.module('HistoricalController',['HistoricalService'])
                               false : true
           });
         });
-
-        heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value, $scope.sensors);
+        
         if(sensorFeatures.length === 0){
           sensorFeatures = mapModule.makeSensorFeatureArray($scope.sensors);
-          mapModule.addSensorLayer(sensorFeatures);
+          mapModule.addSensorLayer(sensorFeatures);         
         }
-        
+
+        heatmapFeatures = mapModule.plotHeatmap($scope.freqSlider.value, $scope.sensors);                  
+        let interpolationData = res.data.interpolation;
+        mapModule.plotInterpolation(interpolationData);         
+
         t0 = moment(t1.format());
         t1 = times.shift();
         setTimeout(loopData(t0,t1,times),1e3);
@@ -217,10 +220,10 @@ angular.module('HistoricalController',['HistoricalService'])
     
     Historical.getLineGraph(args)
     .then(function(res){
-      console.log(res.data.message);
+      // console.log(res.data.message);
       // let data = res.data;
       // $scope.lineData = [];
-      
+
     },
     function(err){
       console.log(err);

@@ -50,17 +50,21 @@ module.exports = function(app,express,config){
 							interpolationInput.push(sensors[i].Latitude);
 							interpolationInput.push(sensors[i].Longitude);
 							interpolationInput.push(sensorReadings.READINGS);
+
+							// console.log("Lat"+typeof sensors[i].Latitude);
+							// console.log("Lon"+typeof sensors[i].Longitude);
+							// console.log("reading"+typeof sensorReadings.READINGS);
 						}
-					}					
+					}
 				});
 
-				// console.log(interpolationInput);
+				// console.log("input type:" + typeof interpolationInput);
 				if(!interpolating && interpolationInput.length !== 0){
 					interpolating = true;
 					//[sensor lat,sensor lon,sensor str@freq, .... for all sensors]
-					console.log(interpolationInput.length);					
+					// console.log(interpolationInput.length);					
 
-					const ps = spawn("interpolate.exe",interpolationInput);
+					var ps = spawn("interpolate.exe",interpolationInput);
 					ps.stdout.on('data',function(data){
 						interpolating = false;
 						console.log(data);
@@ -118,16 +122,19 @@ module.exports = function(app,express,config){
 				readings.forEach(function(sensorReadings){
 					interpolationInput.push(sensorReadings.Latitude);
 					interpolationInput.push(sensorReadings.Longitude);
-					interpolationInput.push(sensorReadings.READINGS);
+					interpolationInput.push(sensorReadings.Readings);
 
-					// console.log("Lat"+sensorReadings.Latitude);
-					// console.log("Lon"+sensorReadings.Longitude);
-					// console.log("reading"+sensorReadings.Readings);
+					// console.log("Lat"+typeof sensorReadings.Latitude);
+					// console.log("Lon"+typeof sensorReadings.Longitude);
+					// console.log("reading"+typeof sensorReadings.Readings);
 				});
 
-				if(!interpolating && interpolationInput.length !== 0){
+				// console.log("input type:" + typeof interpolationInput);
+				
+
+				if(!interpolating){
 					interpolating = true;
-					const ps = spawn("interpolate.exe",interpolationInput);
+					var ps = spawn("interpolate-hist.exe",interpolationInput);
 					ps.stdout.on('data',function(data){
 						interpolating = false;
 						// console.log(data);
@@ -162,7 +169,45 @@ module.exports = function(app,express,config){
 						}
 					});
 				}else{
-					res.json({'readings':readings});
+					while(interpolating){
+						if(!interpolating){
+							interpolating = true;
+							var ps = spawn("interpolate-hist.exe",interpolationInput);
+							ps.stdout.on('data',function(data){
+								interpolating = false;
+								// console.log(data);
+							});
+							ps.stderr.on('data',function(data){
+								interpolating = false;
+								// console.log(data);
+							});
+							ps.on('error',function(err){
+								interpolating = false;
+								// console.log(err);
+							});
+							ps.on('close',function(code){
+								interpolating = false;
+								// console.log("----code:"+code);
+								if(code === 0){
+									fs.readFile("./estimatedPoints.json",function(err,data){
+										if(err){console.log(err);}
+										else{
+											// console.log(JSON.parse(data));
+											var interpolation = JSON.parse(data);
+											interpolating = false;
+											res.json({
+												'readings':readings,
+												'interpolation':interpolation.interpolation
+											});
+										}
+									});
+								}else{
+									interpolating = false;
+									res.json({'readings':readings});
+								}
+							});						
+						}
+					}
 				}
 			});
 	});

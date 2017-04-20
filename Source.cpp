@@ -323,6 +323,7 @@ std::vector<MeasuredPoint> interpolation(std::vector <MeasuredPoint> sensors, st
 //name get MeasuredPoints later
 int main(int argc, char* argv[])
 {
+	try{
 	if(argc == 1){return 0;}
 
 	unsigned int i;
@@ -382,7 +383,15 @@ int main(int argc, char* argv[])
 	 
 	//cout << packet.dump();
 	// cin >> x;
+	
+	}catch(std::invalid_argument &ex){
+		std::ofstream out;
 
+		out.open("out.txt");
+		out << ex.what();
+ 		out << "(" << __FUNCTION__ << ") on line " << __LINE__ << "\n";
+		out.close();
+	}
 	return 0;
 }
 

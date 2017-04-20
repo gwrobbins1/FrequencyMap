@@ -34,10 +34,10 @@ angular.module('LiveController',["LiveService"])
 		value:0,
 		options:{
 			floor:0,
-			ceil:1700,
+			ceil:225,
 			step:1,
   		minLimit:0,
-  		maxLimit:1700,
+  		maxLimit:225,
       onChange: sliderChangeHandler
 		}
 	};
